@@ -4,7 +4,7 @@ import { Ticket } from "./Ticket.js";
 
 // DDD - Aggregate root
 export class Board {
-    private _columns: Map<string, Column> = new Map();
+    private readonly _columns: Map<string, Column> = new Map();
 
     constructor(columns: Column[]) {
         this._columns = new Map(columns.map(col => [col.stateId, col]));
@@ -12,10 +12,10 @@ export class Board {
 
     get columns(): ReadonlyMap<string, Column> { return this._columns; }
 
-    public moveTicket(ticketId: number, targetColumnId: string): void {
+    public moveTicket(ticketId: string, targetColumnId: string): void {
         const ticket = this.getTicket(ticketId);
         
-        const sourceCol = this.getColumn(ticket.stateId);
+        const sourceCol = this.getColumn(ticket.columnId);
         const targetCol = this.getColumn(targetColumnId);
 
         ticket.transitionTo(targetColumnId);
@@ -30,9 +30,9 @@ export class Board {
         return column;
     }
 
-    public getTicket(ticketId: number): Ticket {
+    public getTicket(ticketId: string): Ticket {
         for(const column of this.columns.values()) {
-            const ticket = column.tickets.find(t => t.id === ticketId);
+            const ticket = column.tickets[ticketId];
             if (ticket) {
                 return ticket;
             }

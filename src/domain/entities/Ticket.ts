@@ -1,41 +1,40 @@
+import { Exclude, Expose } from "class-transformer";
+
 // DDD - Entity
 export class Ticket {
     constructor(
-        private readonly _id: number,
+        private readonly _id: string,
+        private _columnId: string,
         private _name: string,
         private _description: string,
-        private _stateId: string,
-        private readonly _created: Date = new Date(),
-        private _updated: Date | null = null
+        private readonly _created: string = new Date().toISOString(),
+        private _updated: string | null = null
     ) {}
 
-    get id(): number {
-        return this._id;
-    }
+    @Exclude() get id(): string { return this._id; }
 
-    get name(): string {
-        return this._name;
-    }
+    @Expose({ name: 'columnId' }) 
+    get columnId(): string { return this._columnId; }
+    set columnId(columnId: string) { this._columnId = columnId; }
 
-    get description(): string {
-        return this._description;
-    }
+    @Expose({ name: 'name' }) 
+    get name(): string { return this._name; }
+    set name(name: string) { this._name = name; }
 
-    get stateId(): string {
-        return this._stateId;
-    }
+    @Expose({ name: 'description' }) 
+    get description(): string { return this._description; }
+    set description(description: string) { this._description = description; }
 
-    get created(): Date {
-        return this._created;
-    }
+    @Expose({ name: 'created' }) 
+    get created(): string { return this._created; }
 
-    get updated(): Date | null {
-        return this._updated;
-    }
+    @Expose({ name: 'updated' }) 
+    get updated(): string | null { return this._updated; }
+    set updated(updated: string) { this._updated = updated; }
 
-    public transitionTo(newStateId: string): void {
-        this._stateId = newStateId;
-        this._updated = new Date();
+    public transitionTo(newColumnId: string): void {
+        this._columnId = newColumnId;
+        this._updated = new Date().toISOString();
     }
 
 }

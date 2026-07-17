@@ -5,18 +5,13 @@ import { Board } from "./Board.js";
 import { Ticket } from "./Ticket.js";
 
 describe('Board', () => {
-
-    let ticketId: number;
     
     let board: Board;
     let tickBacklog: Ticket;
 
     beforeEach(() => {
-        ticketId = 1;
-
-        tickBacklog = h.createTicket(ticketId++, h.COLUMN_ID_BACKLOG);
-
-        board = h.createBoard([tickBacklog]);
+        board = h.createBoard();
+        tickBacklog = board.getColumn(h.COLUMN_ID_BACKLOG).tickets.at(0)!;
     });
 
     it('should successfully instantiate the board', () => {
@@ -28,7 +23,7 @@ describe('Board', () => {
         it('should successfully move a ticket from one column to another and add the ticket updated date', () => {
             expect(tickBacklog.updated).toBe(null);
 
-            const originalColumn = board.getColumn(tickBacklog.stateId);
+            const originalColumn = board.getColumn(tickBacklog.columnId);
             expect(originalColumn.stateId).toBe(h.COLUMN_ID_BACKLOG);
             expect(originalColumn.tickets).toContain(tickBacklog);
 
@@ -36,12 +31,12 @@ describe('Board', () => {
 
             expect(originalColumn.tickets).not.toContain(tickBacklog);
 
-            const newColumn = board.getColumn(tickBacklog.stateId);
+            const newColumn = board.getColumn(tickBacklog.columnId);
             expect(newColumn.stateId).toBe(h.COLUMN_ID_IN_PROGRESS);
             expect(newColumn.tickets).toContain(tickBacklog);
 
             const ticket = board.getTicket(tickBacklog.id);
-            expect(ticket.stateId).toBe(h.COLUMN_ID_IN_PROGRESS);
+            expect(ticket.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
             expect(ticket.updated).not.toBe(null);
         });
         
@@ -58,7 +53,7 @@ describe('Board', () => {
         it('should throw an error if the column cannot be found', () => {
             expect(() => {
                 board.getColumn(h.COLUMN_ID_INVALID)
-            }).toThrowError(ERROR_CODES.B00(h.COLUMN_ID_INVALID)); 
+            }).toThrow(ERROR_CODES.B00(h.COLUMN_ID_INVALID)); 
         });
 
     });
@@ -73,8 +68,8 @@ describe('Board', () => {
 
         it('should throw an error if the ticket cannot be found', () => {
             expect(() => {
-                board.getTicket(Infinity)
-            }).toThrowError(ERROR_CODES.B01(Infinity)); 
+                board.getTicket("UNKNOWN")
+            }).toThrow(ERROR_CODES.B01("UNKNOWN")); 
         });
 
     });

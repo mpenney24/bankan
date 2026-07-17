@@ -14,11 +14,12 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
+    //Reflection/annotations
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",

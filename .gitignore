@@ -9,7 +9,11 @@ out/
 # IDE / OS specific files
 .vscode/
 
-# Environment variables & Local logs
+# Environment variables, logs
 .env
 .env.local
+*firebase*.json
 *.log
+
+#Local files
+src/run.ts

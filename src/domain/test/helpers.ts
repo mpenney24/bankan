@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { BoardSchema } from "../config/BoardSchema.js";
 import { Board } from "../entities/Board.js";
 import { Column } from "../entities/Column.js";
@@ -5,9 +6,9 @@ import { Ticket } from "../entities/Ticket.js";
 
 // KEY LOGIC
 
-export const COLUMN_ID_BACKLOG = 'BACKLOG';
-export const COLUMN_ID_IN_PROGRESS = 'IN_PROGRESS';
-export const COLUMN_ID_DONE = 'DONE';
+export const COLUMN_ID_BACKLOG: string = 'BACKLOG';
+export const COLUMN_ID_IN_PROGRESS: string = 'IN_PROGRESS';
+export const COLUMN_ID_DONE: string = 'DONE';
 
 export const COLUMN_ID_INVALID = 'INVALID';
 
@@ -32,20 +33,12 @@ export const TEST_BOARD_SCHEMA = {
 } satisfies BoardSchema;
 export const TEST_BOARD_SCHEMA_KEYS = Object.keys(TEST_BOARD_SCHEMA);
 
-// Type logic
-
-export type ValidTestColumnIdType = keyof typeof TEST_BOARD_SCHEMA;
-export type AllTestColumnIdType = ValidTestColumnIdType | typeof COLUMN_ID_INVALID;
-
 // CREATION LOGIC
 
-export const createBoard = (tickets: Ticket[] = []): Board => {
-    const columns = (Object.keys(TEST_BOARD_SCHEMA) as ValidTestColumnIdType[]).map(id => {
+export const createBoard = (): Board => {
+    const columns = (Object.keys(TEST_BOARD_SCHEMA)).map(id => {
         const col = createColumn(id);
-        
-        const matchingTickets = tickets.filter(t => t.stateId === id);
-        matchingTickets.forEach(t => col.addTicket(t));
-        
+        col.addTicket(createTicket(id));
         return col;
     });
     
@@ -53,17 +46,19 @@ export const createBoard = (tickets: Ticket[] = []): Board => {
 }
 
 export const createColumn = (
-    stateId: AllTestColumnIdType = COLUMN_ID_BACKLOG
+    stateId: string = COLUMN_ID_BACKLOG
 ): Column => {
+    const id = randomUUID();
+
     if (stateId === COLUMN_ID_INVALID) {
-        return new Column(COLUMN_ID_INVALID, 'Invalid Column', null, null);
+        return new Column(id, COLUMN_ID_INVALID, 'Invalid Column', null, null);
     }
 
-    const { displayName, prevStateId, nextStateId } = TEST_BOARD_SCHEMA[stateId];
+    const { displayName, prevStateId, nextStateId } = TEST_BOARD_SCHEMA[stateId]!;
 
-    return new Column(stateId, displayName, prevStateId, nextStateId);
+    return new Column(id, stateId, displayName, prevStateId, nextStateId);
 };
 
-export const createTicket = (id: number, stateId: AllTestColumnIdType = COLUMN_ID_BACKLOG) => {
-    return new Ticket(id, 'Test Ticket', 'A test ticket', stateId);
+export const createTicket = (columnId: string) => {
+    return new Ticket(randomUUID(), columnId, 'Test Ticket', 'A test ticket', new Date().toISOString());
 }

@@ -5,14 +5,12 @@ import { Ticket } from "./Ticket.js";
 
 describe('Column', () => {
 
-    let ticketId: number;
     let column: Column;
     let ticket: Ticket;
 
     beforeEach(() => {
-        ticketId = 1;
         column = h.createColumn(h.COLUMN_ID_BACKLOG);
-        ticket = h.createTicket(ticketId++, h.COLUMN_ID_BACKLOG);
+        ticket = h.createTicket(h.COLUMN_ID_BACKLOG);
     })
 
     describe('#addTicket', () => {
