@@ -32,7 +32,7 @@ export class Board {
 
     public getTicket(ticketId: string): Ticket {
         for(const column of this.columns.values()) {
-            const ticket = column.tickets[ticketId];
+            const ticket = column.tickets.find(t => t.id === ticketId);
             if (ticket) {
                 return ticket;
             }

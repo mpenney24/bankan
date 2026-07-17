@@ -1,7 +1,7 @@
 import { Board } from "../entities/Board.js";
 import { Column } from "../entities/Column.js";
 
-export class WorkflowService {
+export class TicketService {
 
     public static regressTicket(board: Board, ticketId: string): void {
         this.moveTicket(board, ticketId, (currentColumn) => currentColumn.prevColumn);

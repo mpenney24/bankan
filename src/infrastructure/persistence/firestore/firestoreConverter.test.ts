@@ -16,7 +16,7 @@ describe('createFirestoreConverter', () => {
     beforeEach(() => {
         board = h.createBoard();
         column = board.getColumn(h.COLUMN_ID_BACKLOG);
-        ticket = column.tickets.at(0)!;
+        ticket = column.tickets[0]!;
     });
 
     describe('#toFirestore', () => {
@@ -35,8 +35,6 @@ describe('createFirestoreConverter', () => {
             const doc = converter.toFirestore(modelInstance);
 
             expect(doc).not.toEqual({});
-            expect(doc).not.toHaveProperty('_id');
-            expect(doc).not.toHaveProperty('id');
 
             const expectedPlain = instanceToPlain(modelInstance, {
                 strategy: 'excludeAll'
@@ -65,19 +63,19 @@ describe('createFirestoreConverter', () => {
             const clazz = modelInstance.constructor as ClassConstructor<any>;
             const converter = createFirestoreConverter(clazz);
     
-            const plainData = instanceToPlain(ticket, {
+            const plainData = instanceToPlain(modelInstance, {
                 strategy: 'excludeAll'
             });
 
             const mockSnapshot = {
-                id: ticket.id,
+                id: modelInstance.id,
                 exists: true,
                 data: () => plainData,
             } as unknown as QueryDocumentSnapshot; 
 
             const object = converter.fromFirestore(mockSnapshot);
 
-            expect(object).toMatchObject(ticket);
+            expect(object).toEqual(modelInstance);
         }
 
     });

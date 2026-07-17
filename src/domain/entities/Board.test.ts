@@ -11,7 +11,7 @@ describe('Board', () => {
 
     beforeEach(() => {
         board = h.createBoard();
-        tickBacklog = board.getColumn(h.COLUMN_ID_BACKLOG).tickets.at(0)!;
+        tickBacklog = board.getColumn(h.COLUMN_ID_BACKLOG).tickets[0]!;
     });
 
     it('should successfully instantiate the board', () => {
