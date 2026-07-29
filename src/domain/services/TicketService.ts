@@ -11,7 +11,7 @@ export class TicketService {
         this.moveTicket(board, ticketId, (currentColumn) => currentColumn.nextColumn);
     }
 
-    private static moveTicket(
+    public static moveTicket(
         board: Board, 
         ticketId: string, 
         resolveNextStateId: (column: Column) => string | null

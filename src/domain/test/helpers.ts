@@ -1,5 +1,4 @@
 import { randomUUID } from "crypto";
-import { BoardSchema } from "../config/BoardSchema.js";
 import { Board } from "../entities/Board.js";
 import { Column } from "../entities/Column.js";
 import { Ticket } from "../entities/Ticket.js";
@@ -30,19 +29,21 @@ export const TEST_BOARD_SCHEMA = {
        prevStateId: COLUMN_ID_IN_PROGRESS, 
        nextStateId: null 
    }
-} satisfies BoardSchema;
+}
 export const TEST_BOARD_SCHEMA_KEYS = Object.keys(TEST_BOARD_SCHEMA);
 
 // CREATION LOGIC
 
 export const createBoard = (): Board => {
-    const columns = (Object.keys(TEST_BOARD_SCHEMA)).map(id => {
+    const board = new Board(randomUUID());
+    
+    (Object.keys(TEST_BOARD_SCHEMA)).forEach(id => {
         const col = createColumn(id);
         col.addTicket(createTicket(id));
-        return col;
+        board.columns.push(col);
     });
     
-    return new Board(columns);
+    return board;
 }
 
 export const createColumn = (

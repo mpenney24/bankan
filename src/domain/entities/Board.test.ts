@@ -15,7 +15,7 @@ describe('Board', () => {
     });
 
     it('should successfully instantiate the board', () => {
-        expect(board.columns.size).toBe(h.TEST_BOARD_SCHEMA_KEYS.length);
+        expect(board.columns.length).toBe(h.TEST_BOARD_SCHEMA_KEYS.length);
     });
 
     describe('#moveTicket', () => {
@@ -45,8 +45,8 @@ describe('Board', () => {
     describe('#getColumn', () => {
         
         it('should successfully retrieve the stored column', () => {
-            expect(board.getColumn(h.COLUMN_ID_BACKLOG)).toStrictEqual(
-                board.columns.get(h.COLUMN_ID_BACKLOG)
+            expect(board.columns.find(col => col.stateId === h.COLUMN_ID_BACKLOG)).toStrictEqual(
+                board.getColumn(h.COLUMN_ID_BACKLOG)
             );
         });
 

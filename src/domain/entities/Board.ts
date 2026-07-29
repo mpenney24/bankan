@@ -1,31 +1,28 @@
 import { Column } from "./Column.js";
 import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { Ticket } from "./Ticket.js";
+import { Exclude, Expose, Type } from "class-transformer";
 
 // DDD - Aggregate root
+@Exclude()
 export class Board {
-    private readonly _columns: Map<string, Column> = new Map();
+    
+    @Expose({ name: 'columns' })
+    @Type(() => Column)
+    private _columns: Column[] = [];
 
-    constructor(columns: Column[]) {
-        this._columns = new Map(columns.map(col => [col.stateId, col]));
-    }
+    constructor(
+        private _id: string
+    ) {}
 
-    get columns(): ReadonlyMap<string, Column> { return this._columns; }
+    get id(): string { return this._id; }
+    private set id(id: string) { this._id = id; }
 
-    public moveTicket(ticketId: string, targetColumnId: string): void {
-        const ticket = this.getTicket(ticketId);
-        
-        const sourceCol = this.getColumn(ticket.columnId);
-        const targetCol = this.getColumn(targetColumnId);
-
-        ticket.transitionTo(targetColumnId);
-
-        sourceCol.removeTicket(ticket.id);
-        targetCol.addTicket(ticket);
-    }
+    @Expose() get columns(): Column[] { return this._columns; }
+    private set columns(columns: Column[]) { this._columns = columns }
 
     public getColumn(stateId: string): Column {
-        const column = this._columns.get(stateId);
+        const column = this._columns.find(col => col.stateId === stateId);
         if (!column) throw new Error(ERROR_CODES.B00(stateId));
         return column;
     }
@@ -38,6 +35,18 @@ export class Board {
             }
         }
         throw new Error(ERROR_CODES.B01(ticketId));
+    }
+
+    public moveTicket(ticketId: string, targetColumnId: string): void {
+        const ticket = this.getTicket(ticketId);
+        
+        const sourceCol = this.getColumn(ticket.columnId);
+        const targetCol = this.getColumn(targetColumnId);
+
+        ticket.transitionTo(targetColumnId);
+
+        sourceCol.removeTicket(ticket.id);
+        targetCol.addTicket(ticket);
     }
 
 }

@@ -1,4 +1,12 @@
-import { Firestore, CollectionReference, WriteResult } from "firebase-admin/firestore";
+import { 
+    Firestore, 
+    CollectionReference, 
+    collection, 
+    doc, 
+    getDoc, 
+    getDocs, 
+    setDoc 
+} from "firebase/firestore";
 import { createFirestoreConverter } from "./firestoreConverter.js";
 import { ClassConstructor } from "class-transformer";
 
@@ -14,25 +22,29 @@ export class FirestoreRepository<T extends Identifiable> {
         collectionName: string,
         entityClass: ClassConstructor<T>
     ) {
-        this.documents = this.db
-            .collection(collectionName)
-            .withConverter(createFirestoreConverter(entityClass));
+        this.documents = collection(this.db, collectionName).withConverter(
+            createFirestoreConverter(entityClass)
+        ) as CollectionReference<T>;
     }
 
     public async getById(id: string): Promise<T | null> {
-        const docRef = this.documents.doc(id);
-        const snapshot = await docRef.get();
-        if (!snapshot.exists) return null;
-        return snapshot.data()!;
+        // Mitch - add these to Errors.ts
+        if (!id || id.trim() === "") throw new Error("Invalid document ID: ID cannot be empty");
+    
+        const docRef = doc(this.documents, id);
+        const snapshot = await getDoc(docRef);
+        
+        if (!snapshot.exists()) throw new Error("Invalid document ID: Document could not be found");
+        return snapshot.data();
     }
 
-    public async save(entity: T): Promise<WriteResult> {
-        const docRef = this.documents.doc(entity.id);
-        return await docRef.set(entity);
+    public async save(entity: T): Promise<void> {
+        const docRef = doc(this.documents, entity.id);
+        await setDoc(docRef, entity);
     }
 
     public async getAll(): Promise<T[]> {
-        const querySnapshot = await this.documents.get();
-        return querySnapshot.docs.map(doc => doc.data());
+        const querySnapshot = await getDocs(this.documents);
+        return querySnapshot.docs.map(docSnap => docSnap.data());
     }
 }

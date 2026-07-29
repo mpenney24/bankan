@@ -1,12 +1,10 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
     "composite": true,
     // Environment Settings
-    // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
     "noEmit": true,
@@ -17,15 +15,16 @@
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    //Reflection/annotations
+    // Reflection/annotations
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
+    "types": ["vite/client"],
     "isolatedModules": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "exclude": [

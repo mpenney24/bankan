@@ -5,7 +5,7 @@ import { Column } from "../../../domain/entities/Column.js";
 import { Ticket } from "../../../domain/entities/Ticket.js";
 import { createFirestoreConverter } from "./firestoreConverter.js";
 import { ClassConstructor, instanceToPlain } from "class-transformer";
-import { QueryDocumentSnapshot } from "firebase-admin/firestore";
+import { QueryDocumentSnapshot } from "firebase/firestore";
 
 describe('createFirestoreConverter', () => {
 
@@ -20,6 +20,10 @@ describe('createFirestoreConverter', () => {
     });
 
     describe('#toFirestore', () => {
+
+        it('should successfully compose Board object into Firestore-compatible document', () => {
+            verifyFirestoreComposition(board);
+        });
 
         it('should successfully compose Column object into Firestore-compatible document', () => {
             verifyFirestoreComposition(column);
@@ -50,6 +54,10 @@ describe('createFirestoreConverter', () => {
     });
 
     describe('#fromFirestore', () => {
+
+        it('should successfully decompose Firestore document into Board object', () => {
+            verifyFirestoreDeomposition(board);
+        });
 
         it('should successfully decompose Firestore document into Column object', () => {
             verifyFirestoreDeomposition(column);

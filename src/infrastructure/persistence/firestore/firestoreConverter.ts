@@ -3,7 +3,7 @@ import {
     QueryDocumentSnapshot, 
     WithFieldValue, 
     DocumentData 
-} from "firebase-admin/firestore";
+} from "firebase/firestore";
 import { instanceToPlain, ClassConstructor, plainToInstance } from "class-transformer";
 
 export function createFirestoreConverter<TApp extends object>(
