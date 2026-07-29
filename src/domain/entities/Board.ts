@@ -15,15 +15,15 @@ export class Board {
         private _id: string
     ) {}
 
-    get id(): string { return this._id; }
+    @Expose() get id(): string { return this._id; }
     private set id(id: string) { this._id = id; }
 
     @Expose() get columns(): Column[] { return this._columns; }
     private set columns(columns: Column[]) { this._columns = columns }
 
-    public getColumn(stateId: string): Column {
-        const column = this._columns.find(col => col.stateId === stateId);
-        if (!column) throw new Error(ERROR_CODES.B00(stateId));
+    public getColumn(columnId: string): Column {
+        const column = this._columns.find(col => col.id === columnId);
+        if (!column) throw new Error(ERROR_CODES.B00(columnId));
         return column;
     }
 

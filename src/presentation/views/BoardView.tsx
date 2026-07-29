@@ -1,11 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { plainToInstance } from 'class-transformer';
+import React from 'react';
 import { ColumnComponent } from '../components/ColumnComponent.js';
-import { Board } from '../../domain/entities/Board.js';
-import { FirestoreRepository } from '../../infrastructure/persistence/firestore/FirestoreRepository.js';
-import { getFirestoreDb } from '../../infrastructure/persistence/firestore/connection.js';
-import { TicketService } from '../../domain/services/TicketService.js';
 import { styled } from 'styled-components';
+import { useBoard } from '../hooks/useBoard.js';
 
 const ColumnsWrapper = styled.div`
     display: flex;
@@ -15,45 +11,22 @@ const ColumnsWrapper = styled.div`
     overflow-x: auto;
     padding-bottom: 1rem;
     width: 100%;
+
+    & > * {
+        flex: 1;
+        min-width: 280px;
+        max-width: 350px;
+    }
 `;
 
 const BOARD_ID: string = import.meta.env.VITE_FIREBASE_BOARD_ID;
 
 export const BoardView: React.FC = () => {
-    const [board, setBoard] = useState<Board | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const boardRepo = new FirestoreRepository(getFirestoreDb(), 'boards', Board);
+    const { board, loading, error, handleTicketDrop } = useBoard(BOARD_ID);
 
-    useEffect(() => {
-        boardRepo.getById(BOARD_ID).then((loadedBoard) => {
-            setBoard(loadedBoard);
-            setIsLoading(false);
-        });
-    }, []);
-
-    const handleTicketDrop = useCallback(async (ticketId: string, targetColumnId: string) => {
-        if (!board) return;
-
-        // Clone board instance to safely trigger React state re-render
-        const boardCopy = plainToInstance(Board, board);
-
-        try {
-            // DDD Aggregate Root handles the domain logic update
-            TicketService.moveTicket(board, ticketId, () => targetColumnId);
-            
-            setBoard(boardCopy);
-            await boardRepo.save(board);
-        } catch (error) {
-            console.error('Failed to move ticket:', error);
-            setBoard(board); // Revert state on failure
-        }
-    }, [board]);
-
-    if (isLoading || !board) {
-        return <div>Loading board...</div>;
-    }
-
-    console.log(JSON.stringify(board, null, 2));
+    if (loading) return <div>Loading board...</div>;
+    if (error) return <div>Error loading board: {error.message}</div>;
+    if (!board) return <div>Board not found</div>;
 
     return (
         <div className="board-wrapper">
@@ -61,10 +34,10 @@ export const BoardView: React.FC = () => {
             <ColumnsWrapper>
                 {board.columns.map(col => (
                     <ColumnComponent
-                        key={col.stateId}
+                        key={col.id}
                         columnId={col.id}
                         title={col.displayName}
-                        tickets={board.getColumn(col.stateId).tickets}
+                        tickets={board.getColumn(col.id).tickets}
                         onTicketDrop={handleTicketDrop}
                     />
                 ))}

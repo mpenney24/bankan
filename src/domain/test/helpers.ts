@@ -5,41 +5,51 @@ import { Ticket } from "../entities/Ticket.js";
 
 // KEY LOGIC
 
-export const COLUMN_ID_BACKLOG: string = 'BACKLOG';
-export const COLUMN_ID_IN_PROGRESS: string = 'IN_PROGRESS';
-export const COLUMN_ID_DONE: string = 'DONE';
+export const COLUMN_STATE_ID_BACKLOG: string = 'BACKLOG';
+export const COLUMN_STATE_ID_IN_PROGRESS: string = 'IN_PROGRESS';
+export const COLUMN_STATE_ID_DONE: string = 'DONE';
 
-export const COLUMN_ID_INVALID = 'INVALID';
+export const COLUMN_ID_BACKLOG: string = randomUUID();
+export const COLUMN_ID_IN_PROGRESS: string = randomUUID();
+export const COLUMN_ID_DONE: string = randomUUID();
+
+export const COLUMN_STATE_ID_INVALID: string = 'INVALID';
+export const COLUMN_ID_INVALID: string = randomUUID();
 
 // SCHEMA LOGIC
 
-export const TEST_BOARD_SCHEMA = {
-   [COLUMN_ID_BACKLOG]: { 
+export type ColumnSchemaDefinition = Pick<Column, 'id' | 'displayName' | 'prevColumnId' | 'nextColumnId'>;
+
+export const TEST_BOARD_COLUMN_SCHEMA: Record<string, ColumnSchemaDefinition> = {
+   [COLUMN_STATE_ID_BACKLOG]: {
+       id: COLUMN_ID_BACKLOG,
        displayName: 'Backlog', 
-       prevStateId: null, 
-       nextStateId: COLUMN_ID_IN_PROGRESS 
+       prevColumnId: null, 
+       nextColumnId: COLUMN_ID_IN_PROGRESS
    },
-   [COLUMN_ID_IN_PROGRESS]: { 
+   [COLUMN_STATE_ID_IN_PROGRESS]: {
+       id: COLUMN_ID_IN_PROGRESS,
        displayName: 'In Progress', 
-       prevStateId: COLUMN_ID_BACKLOG, 
-       nextStateId: COLUMN_ID_DONE 
+       prevColumnId: COLUMN_ID_BACKLOG, 
+       nextColumnId: COLUMN_ID_DONE 
    },
-   [COLUMN_ID_DONE]: { 
+   [COLUMN_STATE_ID_DONE]: {
+       id: COLUMN_ID_DONE, 
        displayName: 'Done', 
-       prevStateId: COLUMN_ID_IN_PROGRESS, 
-       nextStateId: null 
+       prevColumnId: COLUMN_ID_IN_PROGRESS, 
+       nextColumnId: null 
    }
-}
-export const TEST_BOARD_SCHEMA_KEYS = Object.keys(TEST_BOARD_SCHEMA);
+};
+export const TEST_BOARD_COLUMN_SCHEMA_KEYS = Object.keys(TEST_BOARD_COLUMN_SCHEMA);
 
 // CREATION LOGIC
 
 export const createBoard = (): Board => {
     const board = new Board(randomUUID());
     
-    (Object.keys(TEST_BOARD_SCHEMA)).forEach(id => {
-        const col = createColumn(id);
-        col.addTicket(createTicket(id));
+    TEST_BOARD_COLUMN_SCHEMA_KEYS.forEach(stateId => {
+        const col = createColumn(stateId);
+        col.addTicket(createTicket(col.id));
         board.columns.push(col);
     });
     
@@ -47,17 +57,16 @@ export const createBoard = (): Board => {
 }
 
 export const createColumn = (
-    stateId: string = COLUMN_ID_BACKLOG
+    stateId: string = COLUMN_STATE_ID_BACKLOG
 ): Column => {
-    const id = randomUUID();
 
-    if (stateId === COLUMN_ID_INVALID) {
-        return new Column(id, COLUMN_ID_INVALID, 'Invalid Column', null, null);
+    if (stateId === COLUMN_STATE_ID_INVALID) {
+        return new Column(COLUMN_ID_INVALID, COLUMN_STATE_ID_INVALID, 'Invalid Column', null, null);
     }
 
-    const { displayName, prevStateId, nextStateId } = TEST_BOARD_SCHEMA[stateId]!;
+    const { id, displayName, prevColumnId, nextColumnId } = TEST_BOARD_COLUMN_SCHEMA[stateId]!;
 
-    return new Column(id, stateId, displayName, prevStateId, nextStateId);
+    return new Column(id, stateId, displayName, prevColumnId, nextColumnId);
 };
 
 export const createTicket = (columnId: string) => {

@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import * as h from "../test/helpers.js";
+import { randomUUID } from "crypto";
 
 describe('Ticket', () => {
 

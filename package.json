@@ -13,7 +13,7 @@
     "test": "vitest",
     "modules": "rm -rf node_modules package-lock.json && npm i",
     "db": "tsx ./src/run.ts",
-    "dev": "npx vite"
+    "dev": "npm run pretest && npx vite"
   },
   "keywords": [],
   "author": "",

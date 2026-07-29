@@ -15,7 +15,7 @@ describe('Board', () => {
     });
 
     it('should successfully instantiate the board', () => {
-        expect(board.columns.length).toBe(h.TEST_BOARD_SCHEMA_KEYS.length);
+        expect(board.columns.length).toBe(h.TEST_BOARD_COLUMN_SCHEMA_KEYS.length);
     });
 
     describe('#moveTicket', () => {
@@ -24,7 +24,7 @@ describe('Board', () => {
             expect(tickBacklog.updated).toBe(null);
 
             const originalColumn = board.getColumn(tickBacklog.columnId);
-            expect(originalColumn.stateId).toBe(h.COLUMN_ID_BACKLOG);
+            expect(originalColumn.stateId).toBe(h.COLUMN_STATE_ID_BACKLOG);
             expect(originalColumn.tickets).toContain(tickBacklog);
 
             board.moveTicket(tickBacklog.id, h.COLUMN_ID_IN_PROGRESS);
@@ -32,7 +32,7 @@ describe('Board', () => {
             expect(originalColumn.tickets).not.toContain(tickBacklog);
 
             const newColumn = board.getColumn(tickBacklog.columnId);
-            expect(newColumn.stateId).toBe(h.COLUMN_ID_IN_PROGRESS);
+            expect(newColumn.stateId).toBe(h.COLUMN_STATE_ID_IN_PROGRESS);
             expect(newColumn.tickets).toContain(tickBacklog);
 
             const ticket = board.getTicket(tickBacklog.id);
@@ -45,7 +45,7 @@ describe('Board', () => {
     describe('#getColumn', () => {
         
         it('should successfully retrieve the stored column', () => {
-            expect(board.columns.find(col => col.stateId === h.COLUMN_ID_BACKLOG)).toStrictEqual(
+            expect(board.columns.find(col => col.stateId === h.COLUMN_STATE_ID_BACKLOG)).toStrictEqual(
                 board.getColumn(h.COLUMN_ID_BACKLOG)
             );
         });

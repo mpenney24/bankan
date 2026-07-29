@@ -13,8 +13,8 @@ export class Column {
         private _id: string,
         private _stateId: string,
         private _displayName: string,
-        private _prevColumn: string | null,
-        private _nextColumn: string | null
+        private _prevColumnId: string | null,
+        private _nextColumnId: string | null
     ) {}
 
     @Expose() get id(): string { return this._id; }
@@ -26,11 +26,11 @@ export class Column {
     @Expose() get displayName(): string { return this._displayName; }
     private set displayName(displayName: string) { this._displayName = displayName; }
 
-    @Expose() get prevColumn(): string | null { return this._prevColumn; }
-    private set prevColumn(prevColumn: string) { this._prevColumn = prevColumn; }
+    @Expose() get prevColumnId(): string | null { return this._prevColumnId; }
+    private set prevColumnId(prevColumnId: string) { this._prevColumnId = prevColumnId; }
 
-    @Expose() get nextColumn(): string | null { return this._nextColumn; }
-    private set nextColumn(nextColumn: string) { this._nextColumn = nextColumn; }
+    @Expose() get nextColumnId(): string | null { return this._nextColumnId; }
+    private set nextColumnId(nextColumnId: string) { this._nextColumnId = nextColumnId; }
 
     @Expose() get tickets(): Ticket[] { return Array.from(this._tickets.values()); }
     private set tickets(tickets: Ticket[]) { this._tickets = tickets; }

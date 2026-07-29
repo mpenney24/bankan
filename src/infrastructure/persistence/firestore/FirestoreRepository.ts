@@ -5,10 +5,12 @@ import {
     doc, 
     getDoc, 
     getDocs, 
-    setDoc 
+    setDoc, 
+    onSnapshot
 } from "firebase/firestore";
 import { createFirestoreConverter } from "./firestoreConverter.js";
 import { ClassConstructor } from "class-transformer";
+import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
 
 export interface Identifiable {
     readonly id: string;
@@ -27,15 +29,12 @@ export class FirestoreRepository<T extends Identifiable> {
         ) as CollectionReference<T>;
     }
 
-    public async getById(id: string): Promise<T | null> {
-        // Mitch - add these to Errors.ts
-        if (!id || id.trim() === "") throw new Error("Invalid document ID: ID cannot be empty");
-    
+    public subscribe(id: string, callback: (entity: T | null) => void): () => void {
         const docRef = doc(this.documents, id);
-        const snapshot = await getDoc(docRef);
         
-        if (!snapshot.exists()) throw new Error("Invalid document ID: Document could not be found");
-        return snapshot.data();
+        return onSnapshot(docRef, (snapshot) => {
+            callback(snapshot.exists() ? snapshot.data() : null);
+        });
     }
 
     public async save(entity: T): Promise<void> {
@@ -46,5 +45,15 @@ export class FirestoreRepository<T extends Identifiable> {
     public async getAll(): Promise<T[]> {
         const querySnapshot = await getDocs(this.documents);
         return querySnapshot.docs.map(docSnap => docSnap.data());
+    }
+
+        public async getById(id: string): Promise<T | null> {
+        if (!id || id.trim() === '') throw new Error(ERROR_CODES.F00);
+    
+        const docRef = doc(this.documents, id);
+        const snapshot = await getDoc(docRef);
+        
+        if (!snapshot.exists()) throw new Error(ERROR_CODES.F01(id));
+        return snapshot.data();
     }
 }

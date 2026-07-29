@@ -12,7 +12,6 @@ interface Props {
 export const ColumnComponent: React.FC<Props> = React.memo(({ columnId, title, tickets, onTicketDrop }) => {
     const [isDragOver, setIsDragOver] = useState(false);
 
-    // 1. Prevent default behavior on drag over to allow dropping
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
@@ -27,7 +26,6 @@ export const ColumnComponent: React.FC<Props> = React.memo(({ columnId, title, t
         setIsDragOver(false);
     };
 
-    // 2. Handle the drop action and extract the ticket ID
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragOver(false);
