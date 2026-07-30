@@ -9,7 +9,7 @@ import {
     onSnapshot
 } from "firebase/firestore";
 import { createFirestoreConverter } from "./firestoreConverter.js";
-import { ClassConstructor } from "class-transformer";
+import { ClassConstructor, instanceToPlain, plainToInstance } from "class-transformer";
 import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
 
 export interface Identifiable {
@@ -22,11 +22,16 @@ export class FirestoreRepository<T extends Identifiable> {
     constructor(
         private readonly db: Firestore, 
         collectionName: string,
-        entityClass: ClassConstructor<T>
+        private entityClass: ClassConstructor<T>
     ) {
         this.documents = collection(this.db, collectionName).withConverter(
             createFirestoreConverter(entityClass)
         ) as CollectionReference<T>;
+    }
+
+    public clone(entity: T): T {
+        const plainData = instanceToPlain(entity);
+        return plainToInstance(this.entityClass, plainData);
     }
 
     public subscribe(id: string, callback: (entity: T | null) => void): () => void {

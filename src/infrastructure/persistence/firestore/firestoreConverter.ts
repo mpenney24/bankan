@@ -12,7 +12,9 @@ export function createFirestoreConverter<TApp extends object>(
     return {
         toFirestore(modelObject: TApp): WithFieldValue<DocumentData> {
             return instanceToPlain(modelObject, {
-                strategy: 'excludeAll'
+                strategy: 'excludeAll',
+                // Mitch - delete here if tests don't make a difference?
+                exposeUnsetFields: false
             });
         },
         fromFirestore(snapshot: QueryDocumentSnapshot<DocumentData>): TApp {

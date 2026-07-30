@@ -37,6 +37,12 @@ export class Board {
         throw new Error(ERROR_CODES.B01(ticketId));
     }
 
+    public addTicket(ticket: Ticket): void {
+        const column = this._columns.find(col => col.id === ticket.columnId);
+        if (!column) throw new Error(ERROR_CODES.B00(ticket.columnId));
+        column.addTicket(ticket);
+    }
+
     public moveTicket(ticketId: string, targetColumnId: string): void {
         const ticket = this.getTicket(ticketId);
         

@@ -10,13 +10,13 @@ describe('Ticket', () => {
             const tick = h.createTicket(h.COLUMN_ID_BACKLOG);
 
             expect(tick.columnId).toBe(h.COLUMN_ID_BACKLOG);
-            expect(tick.updated).toBe(null);
+            expect(tick.updated).toBe(undefined);
             
             tick.transitionTo(h.COLUMN_ID_IN_PROGRESS);
             
             expect(tick.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
             expect(tick.created).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-            expect(tick.updated).not.toBe(null);
+            expect(tick.updated).not.toBe(undefined);
         });
 
     });

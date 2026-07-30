@@ -21,7 +21,7 @@ describe('Board', () => {
     describe('#moveTicket', () => {
 
         it('should successfully move a ticket from one column to another and add the ticket updated date', () => {
-            expect(tickBacklog.updated).toBe(null);
+            expect(tickBacklog.updated).toBe(undefined);
 
             const originalColumn = board.getColumn(tickBacklog.columnId);
             expect(originalColumn.stateId).toBe(h.COLUMN_STATE_ID_BACKLOG);
@@ -37,7 +37,7 @@ describe('Board', () => {
 
             const ticket = board.getTicket(tickBacklog.id);
             expect(ticket.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
-            expect(ticket.updated).not.toBe(null);
+            expect(ticket.updated).not.toBe(undefined);
         });
         
     });

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ColumnComponent } from '../components/ColumnComponent.js';
 import { styled } from 'styled-components';
 import { useBoard } from '../hooks/useBoard.js';
+import { AddTicketForm } from '../forms/AddTicketForm.js';
 
 const ColumnsWrapper = styled.div`
     display: flex;
@@ -22,7 +23,8 @@ const ColumnsWrapper = styled.div`
 const BOARD_ID: string = import.meta.env.VITE_FIREBASE_BOARD_ID;
 
 export const BoardView: React.FC = () => {
-    const { board, loading, error, handleTicketDrop } = useBoard(BOARD_ID);
+    const { board, loading, error, handleTicketDrop, handleAddTicket } = useBoard(BOARD_ID);
+    const [isAdding, setIsAdding] = useState(false);
 
     if (loading) return <div>Loading board...</div>;
     if (error) return <div>Error loading board: {error.message}</div>;
@@ -30,7 +32,34 @@ export const BoardView: React.FC = () => {
 
     return (
         <div className="board-wrapper">
-            <h1 className="board-title">Bankan Board</h1>
+            <div className="board-header">
+                <h1 className="board-title">Bankan Board</h1>
+
+                <button onClick={() => setIsAdding(true)} className="primary-btn">
+                    + Add Ticket
+                </button>
+
+                {isAdding && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <button 
+                                className="modal-close" 
+                                onClick={() => setIsAdding(false)}
+                            >
+                                &times;
+                            </button>
+                            
+                            <AddTicketForm 
+                                onAddTicket={(payload) => {
+                                    handleAddTicket(payload);
+                                    setIsAdding(false);
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+
             <ColumnsWrapper>
                 {board.columns.map(col => (
                     <ColumnComponent
@@ -38,7 +67,7 @@ export const BoardView: React.FC = () => {
                         columnId={col.id}
                         title={col.displayName}
                         tickets={board.getColumn(col.id).tickets}
-                        onTicketDrop={handleTicketDrop}
+                        onTicketDrop={(ticketId, targetColumnId) => handleTicketDrop({ ticketId, targetColumnId })}
                     />
                 ))}
             </ColumnsWrapper>

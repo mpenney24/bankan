@@ -72,8 +72,11 @@ describe('createFirestoreConverter', () => {
             const converter = createFirestoreConverter(clazz);
     
             const plainData = instanceToPlain(modelInstance, {
-                strategy: 'excludeAll'
+                strategy: 'excludeAll',
+                exposeUnsetFields: false
             });
+
+            // Mitch - need to check tests here that it's not including/converting the undefined fields!
 
             const mockSnapshot = {
                 id: modelInstance.id,

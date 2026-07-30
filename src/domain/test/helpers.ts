@@ -70,5 +70,5 @@ export const createColumn = (
 };
 
 export const createTicket = (columnId: string) => {
-    return new Ticket(randomUUID(), columnId, 'Test Ticket', 'A test ticket', new Date().toISOString());
+    return Ticket.create({columnId: columnId, name: 'Test Ticket', description: 'A test ticket',priority: 'HIGH' });
 }

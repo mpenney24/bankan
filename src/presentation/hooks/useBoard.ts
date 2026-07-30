@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Board } from '../../domain/entities/Board.js';
 import { Repositories } from '../../infrastructure/persistence/firestore/Repositories.js';
 import { TicketService } from '../../domain/services/TicketService.js';
+import { ERROR_CODES } from '../../errors/ErrorCodes.js';
+import { ICreateTicket, IMoveTicket } from '../../domain/entities/TicketSchema.js';
 
 export function useBoard(boardId: string) {
     const [board, setBoard] = useState<Board | null>(null);
@@ -17,16 +19,33 @@ export function useBoard(boardId: string) {
         return () => unsubscribe();
     }, [boardId]);
 
-    const handleTicketDrop = useCallback(async (ticketId: string, targetColumnId: string) => {
+    const updateBoard = async (
+        update: (optimisticBoard: Board) => void
+    ) => {
         if (!board) return;
+        
+        const optimisticBoard = Repositories.board.clone(board);
+        update(optimisticBoard);
+        setBoard(optimisticBoard);
 
         try {
-            TicketService.moveTicket(board, ticketId, () => targetColumnId);
-            await Repositories.board.save(board);
-        } catch (error) {
-            console.error('Failed to move ticket:', error);
+            await Repositories.board.save(optimisticBoard);
+        } catch (err) {
+            console.error(ERROR_CODES.UIB01, err);
         }
+    }
+
+    const handleTicketDrop = useCallback(async (payload: IMoveTicket) => {
+        await updateBoard((optimisticBoard) => 
+            TicketService.moveTicket(optimisticBoard, payload.ticketId, () => payload.targetColumnId)
+        );
     }, [board]);
 
-    return { board, loading, error, handleTicketDrop };
+    const handleAddTicket = useCallback(async (payload: ICreateTicket) => {
+        await updateBoard((optimisticBoard) => 
+            TicketService.addTicket(optimisticBoard, payload)
+        );
+    }, [board]);
+
+    return { board, loading, error, handleTicketDrop, handleAddTicket };
 }

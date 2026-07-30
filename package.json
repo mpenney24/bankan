@@ -30,11 +30,14 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.5.7",
     "class-transformer": "^0.4.1",
     "firebase": "^12.16.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-hook-form": "^7.83.0",
     "reflect-metadata": "^0.2.2",
-    "styled-components": "^6.4.4"
+    "styled-components": "^6.4.4",
+    "zod": "^4.4.3"
   }
 }

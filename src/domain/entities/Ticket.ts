@@ -1,16 +1,26 @@
 import { Expose } from "class-transformer";
+import { ITicket } from "./TicketSchema.js";
 
 // DDD - Entity
-export class Ticket {
+export class Ticket implements ITicket {
 
-    constructor(
-        private _id: string,
-        private _columnId: string,
-        private _name: string,
-        private _description: string,
-        private _created: string = new Date().toISOString(),
-        private _updated: string | null = null
-    ) {}
+    private _id: string;
+    private _columnId: string;
+    private _name: string;
+    private _description: string;
+    private _priority: string;
+    private _created: string;
+    private _updated: string | undefined;
+
+    private constructor(payload: ITicket) {
+        this._id = payload?.id;
+        this._columnId = payload?.columnId;
+        this._name = payload?.name;
+        this._description = payload?.description;
+        this._priority = payload?.priority;
+        this._created = payload?.created;
+        this._updated = payload?.updated;
+    }
 
     @Expose() get id(): string { return this._id; }
     private set id(id: string) { this._id = id; }
@@ -24,15 +34,26 @@ export class Ticket {
     @Expose() get description(): string { return this._description; }
     set description(description: string) { this._description = description; }
 
+    @Expose() get priority(): string { return this._priority; }
+    set priority(priority: string) { this._priority = priority; }
+
     @Expose() get created(): string { return this._created; }
     private set created(created: string) { this._created = created; }
 
-    @Expose() get updated(): string | null { return this._updated; }
+    @Expose() get updated(): string | undefined { return this._updated; }
     set updated(updated: string) { this._updated = updated; }
 
     public transitionTo(newColumnId: string): void {
         this._columnId = newColumnId;
         this._updated = new Date().toISOString();
+    }
+
+    static create(payload: Omit<ITicket, 'id' | 'created'>): Ticket {
+        return new Ticket({
+            id: crypto.randomUUID(),
+            created: new Date().toISOString(),
+            ...payload
+        });
     }
 
 }

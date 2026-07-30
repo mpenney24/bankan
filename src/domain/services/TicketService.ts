@@ -1,5 +1,7 @@
 import { Board } from "../entities/Board.js";
 import { Column } from "../entities/Column.js";
+import { Ticket } from "../entities/Ticket.js";
+import { ICreateTicket } from "../entities/TicketSchema.js";
 
 export class TicketService {
 
@@ -24,6 +26,15 @@ export class TicketService {
         if (!targetColumnId) return;
 
         board.moveTicket(ticketId, targetColumnId);
+    }
+
+    // Mitch - add tests for this
+
+    public static addTicket(
+        board: Board, 
+        ticket: ICreateTicket
+    ): void {
+        board.addTicket(Ticket.create(ticket));
     }
 
 }

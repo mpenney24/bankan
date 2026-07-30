@@ -43,6 +43,7 @@ export const ColumnComponent: React.FC<Props> = React.memo(({ columnId, title, t
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            style={{ minHeight: '300px' }}
         >
             <div className="column-header">{title}</div>
             <div className="ticket-list">

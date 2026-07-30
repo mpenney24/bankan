@@ -26,7 +26,7 @@ describe('TicketService', () => {
             TicketService.regressTicket(board, tickBacklog.id);
             
             expect(tickBacklog.columnId).toBe(h.COLUMN_ID_BACKLOG);
-            expect(tickBacklog.updated).toBe(null);
+            expect(tickBacklog.updated).toBe(undefined);
         });
 
         it('should successfully regress a ticket in IN_PROGRESS to BACKLOG', () => {
@@ -35,7 +35,7 @@ describe('TicketService', () => {
             TicketService.regressTicket(board, tickInProgress.id);
             
             expect(tickInProgress.columnId).toBe(h.COLUMN_ID_BACKLOG);
-            expect(tickInProgress.updated).not.toBe(null);
+            expect(tickInProgress.updated).not.toBe(undefined);
         });
 
         it('should successfully regress a ticket in DONE to IN_PROGRESS', () => {
@@ -57,7 +57,7 @@ describe('TicketService', () => {
             TicketService.progressTicket(board, tickBacklog.id);
             
             expect(tickBacklog.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
-            expect(tickBacklog.updated).not.toBe(null);
+            expect(tickBacklog.updated).not.toBe(undefined);
         });
 
         it('should successfully progress a ticket in IN_PROGRESS to DONE', () => {
@@ -66,7 +66,7 @@ describe('TicketService', () => {
             TicketService.progressTicket(board, tickInProgress.id);
             
             expect(tickInProgress.columnId).toBe(h.COLUMN_ID_DONE);
-            expect(tickInProgress.updated).not.toBe(null);
+            expect(tickInProgress.updated).not.toBe(undefined);
         });
 
         it('should successfully prevent a ticket in DONE from progressing to a non-existent column', () => {
@@ -75,7 +75,7 @@ describe('TicketService', () => {
             TicketService.progressTicket(board, tickDone.id);
             
             expect(tickDone.columnId).toBe(h.COLUMN_ID_DONE);
-            expect(tickDone.updated).toBe(null);
+            expect(tickDone.updated).toBe(undefined);
         });
 
     });
