@@ -1,38 +1,47 @@
+import { FirestoreRepository } from "../../infrastructure/persistence/firestore/FirestoreRepository.js";
 import { Board } from "../entities/Board.js";
-import { Column } from "../entities/Column.js";
 import { Ticket } from "../entities/Ticket.js";
 import { ICreateTicket } from "../entities/TicketSchema.js";
+import { DomainEventDispatcher } from "../events/DomainEventDispatcher.js";
 
 export class TicketService {
 
-    // Mitch - are these necessary in a drag/drop context? Maybe think about refactoring this once you understand how the board works better
+    constructor(
+        private readonly boardRepository: FirestoreRepository<Board>,
+        private readonly eventDispatcher: DomainEventDispatcher
+    ) {}
 
-    public static regressTicket(board: Board, ticketId: string): void {
-        this.moveTicket(board, ticketId, (currentColumn) => currentColumn.prevColumnId);
-    }
-
-    public static progressTicket(board: Board, ticketId: string): void {
-        this.moveTicket(board, ticketId, (currentColumn) => currentColumn.nextColumnId);
-    }
-
-    public static moveTicket(
+    public async moveTicket(
         board: Board, 
         ticketId: string, 
-        resolveNextColumnId: (column: Column) => string | null
-    ): void {
-        const currentColumn = board.getColumn(board.getTicket(ticketId).columnId);
-
-        const targetColumnId = resolveNextColumnId(currentColumn);
-        if (!targetColumnId) return;
-
+        targetColumnId: string
+    ): Promise<void> {
         board.moveTicket(ticketId, targetColumnId);
+
+        await this.persistAndDispatch(board);
     }
 
-    public static addTicket(
+    public async addTicket(
         board: Board, 
         ticket: ICreateTicket
-    ): void {
+    ): Promise<void> {
         board.addTicket(Ticket.create(ticket));
+
+        await this.persistAndDispatch(board);
+    }
+
+    private async persistAndDispatch(board: Board): Promise<void> {
+        // Mitch - for testing optimistic updates!
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
+        // throw new Error("Simulated network failure");
+
+        await this.boardRepository.save(board);
+
+        const events = board.getDomainEvents();
+        if (events.length > 0) {
+            board.clearDomainEvents();
+            await this.eventDispatcher.dispatch(events);
+        }
     }
 
 }

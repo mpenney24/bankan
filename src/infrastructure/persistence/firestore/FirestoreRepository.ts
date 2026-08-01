@@ -9,7 +9,7 @@ import {
     onSnapshot
 } from "firebase/firestore";
 import { createFirestoreConverter } from "./firestoreConverter.js";
-import { ClassConstructor, instanceToInstance } from "class-transformer";
+import { ClassConstructor } from "class-transformer";
 import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
 import { ZodType } from "zod";
 
@@ -29,10 +29,6 @@ export class FirestoreRepository<T extends Identifiable> {
         this.documents = collection(this.db, collectionName).withConverter(
             createFirestoreConverter(entityClass, entitySchema)
         ) as CollectionReference<T>;
-    }
-
-    public clone(entity: T): T {
-        return instanceToInstance(entity);
     }
 
     public subscribe(id: string, callback: (entity: T | null) => void): () => void {
