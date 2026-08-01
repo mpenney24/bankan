@@ -10,7 +10,7 @@ export class Ticket implements ITicket {
     private _description: string;
     private _priority: string;
     private _created: string;
-    private _updated: string | undefined;
+    private _updated: string | null;
 
     private constructor(payload: ITicket) {
         this._id = payload?.id;
@@ -40,7 +40,7 @@ export class Ticket implements ITicket {
     @Expose() get created(): string { return this._created; }
     private set created(created: string) { this._created = created; }
 
-    @Expose() get updated(): string | undefined { return this._updated; }
+    @Expose() get updated(): string | null { return this._updated; }
     set updated(updated: string) { this._updated = updated; }
 
     public transitionTo(newColumnId: string): void {
@@ -48,10 +48,11 @@ export class Ticket implements ITicket {
         this._updated = new Date().toISOString();
     }
 
-    static create(payload: Omit<ITicket, 'id' | 'created'>): Ticket {
+    static create(payload: Omit<ITicket, 'id' | 'created' | 'updated'>): Ticket {
         return new Ticket({
             id: crypto.randomUUID(),
             created: new Date().toISOString(),
+            updated: null,
             ...payload
         });
     }

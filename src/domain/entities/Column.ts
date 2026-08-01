@@ -1,9 +1,10 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { Ticket } from "./Ticket.js";
+import { IColumn } from "./ColumnSchema.js";
 
 // DDD - Entity
 @Exclude()
-export class Column {
+export class Column implements IColumn {
 
     @Expose({ name: 'tickets' })
     @Type(() => Ticket)

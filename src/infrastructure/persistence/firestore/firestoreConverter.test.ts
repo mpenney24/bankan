@@ -6,6 +6,10 @@ import { Ticket } from "../../../domain/entities/Ticket.js";
 import { createFirestoreConverter } from "./firestoreConverter.js";
 import { ClassConstructor, instanceToPlain } from "class-transformer";
 import { QueryDocumentSnapshot } from "firebase/firestore";
+import { ZodType } from "zod";
+import { BoardSchema } from "../../../domain/entities/BoardSchema.js";
+import { ColumnSchema } from "../../../domain/entities/ColumnSchema.js";
+import { TicketSchema } from "../../../domain/entities/TicketSchema.js";
 
 describe('createFirestoreConverter', () => {
 
@@ -22,20 +26,20 @@ describe('createFirestoreConverter', () => {
     describe('#toFirestore', () => {
 
         it('should successfully compose Board object into Firestore-compatible document', () => {
-            verifyFirestoreComposition(board);
+            verifyFirestoreComposition(board, BoardSchema);
         });
 
         it('should successfully compose Column object into Firestore-compatible document', () => {
-            verifyFirestoreComposition(column);
+            verifyFirestoreComposition(column, ColumnSchema);
         });
 
         it('should successfully compose Ticket object into Firestore-compatible document', () => {
-            verifyFirestoreComposition(ticket);
+            verifyFirestoreComposition(ticket, TicketSchema);
         });
 
-        function verifyFirestoreComposition(modelInstance: any): void {
+        function verifyFirestoreComposition(modelInstance: any, schema: ZodType<any>): void {
             const clazz = modelInstance.constructor as ClassConstructor<any>;
-            const converter = createFirestoreConverter(clazz);
+            const converter = createFirestoreConverter(clazz, schema);
             const doc = converter.toFirestore(modelInstance);
 
             expect(doc).not.toEqual({});
@@ -56,24 +60,23 @@ describe('createFirestoreConverter', () => {
     describe('#fromFirestore', () => {
 
         it('should successfully decompose Firestore document into Board object', () => {
-            verifyFirestoreDeomposition(board);
+            verifyFirestoreDeomposition(board, BoardSchema);
         });
 
         it('should successfully decompose Firestore document into Column object', () => {
-            verifyFirestoreDeomposition(column);
+            verifyFirestoreDeomposition(column, ColumnSchema);
         });
 
         it('should successfully decompose Firestore document into Ticket object', () => {
-            verifyFirestoreDeomposition(ticket);
+            verifyFirestoreDeomposition(ticket, TicketSchema);
         });
 
-        function verifyFirestoreDeomposition(modelInstance: any): void {
+        function verifyFirestoreDeomposition(modelInstance: any, schema: ZodType<any>): void {
             const clazz = modelInstance.constructor as ClassConstructor<any>;
-            const converter = createFirestoreConverter(clazz);
+            const converter = createFirestoreConverter(clazz, schema);
     
             const plainData = instanceToPlain(modelInstance, {
-                strategy: 'excludeAll',
-                exposeUnsetFields: false
+                strategy: 'excludeAll'
             });
 
             // Mitch - need to check tests here that it's not including/converting the undefined fields!

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-hot-toast';
 import { Board } from '../../domain/entities/Board.js';
 import { Repositories } from '../../infrastructure/persistence/firestore/Repositories.js';
 import { TicketService } from '../../domain/services/TicketService.js';
@@ -23,15 +24,22 @@ export function useBoard(boardId: string) {
         update: (optimisticBoard: Board) => void
     ) => {
         if (!board) return;
+
+        const backupBoard = board;
         
         const optimisticBoard = Repositories.board.clone(board);
         update(optimisticBoard);
         setBoard(optimisticBoard);
 
         try {
+            // Mitch - remove this when done testing
+            // await new Promise((resolve) => setTimeout(resolve, 1000));
+            // throw new Error("Simulated network failure");
             await Repositories.board.save(optimisticBoard);
         } catch (err) {
             console.error(ERROR_CODES.UIB01, err);
+            toast.error('Failed to update board, rolling back...');
+            setBoard(backupBoard);
         }
     }
 

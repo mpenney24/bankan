@@ -20,7 +20,7 @@ export type IMoveTicket = z.infer<typeof MoveTicketSchema>;
 export const TicketSchema = CreateTicketSchema.extend({
     id: z.uuid(),
     created: z.iso.datetime(),
-    updated: z.iso.datetime().optional(),
+    updated: z.iso.datetime().nullable(),
 });
 
 export type ITicket = z.infer<typeof TicketSchema>;

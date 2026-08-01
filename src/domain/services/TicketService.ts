@@ -28,8 +28,6 @@ export class TicketService {
         board.moveTicket(ticketId, targetColumnId);
     }
 
-    // Mitch - add tests for this
-
     public static addTicket(
         board: Board, 
         ticket: ICreateTicket

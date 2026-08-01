@@ -1,75 +1,54 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { ICreateTicket, CreateTicketSchema } from '../../domain/entities/TicketSchema.js';
 import { ERROR_CODES } from '../../errors/ErrorCodes.js';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { FormField } from '../components/FormComponent.js';
 
 interface AddTicketFormProps {
     onAddTicket: (payload: ICreateTicket) => void;
 }
 
 export const AddTicketForm: React.FC<AddTicketFormProps> = ({ onAddTicket }) => {
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors }
-    } = useForm({
+    const methods = useForm({
         resolver: zodResolver(CreateTicketSchema)
     });
 
     // Mitch - make it so these onSuccess/onError are global and generic?
     const onSubmit = (data: ICreateTicket) => {
-        console.log("🔥 onSubmit was successfully triggered by React Hook Form with data:", data);
         try {
             onAddTicket(data);
-            reset();
+            methods.reset();
         } catch (error) {
             console.error(ERROR_CODES.UIT01, error);
         }
     };
 
-    const onError = (fieldErrors: typeof errors) => {
+    const onError = (fieldErrors: typeof methods.formState.errors) => {
         console.warn("⚠️ Zod Validation Failed:", fieldErrors);
     };
 
-    // are the errors.priority bits needed and is there a better way to do it?
-
     return (
-        <form onSubmit={handleSubmit(onSubmit, onError)} className="add-ticket-form">
-            <div className="ticket-form-fields">
-                <div className="form-group">
-                    <label>Ticket Name</label>
-                    <input 
-                        type="text" 
-                        placeholder="e.g., Fix login bug" 
-                        {...register('name')} 
+        <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit, onError)} className="add-ticket-form">
+                <div className="ticket-form-fields">
+                    <FormField name="name" label="Ticket Name" placeholder="e.g., Fix login bug" />
+                    
+                    <FormField name="priority" label="Priority" />
+                    
+                    <FormField 
+                        name="description" 
+                        label="Description" 
+                        placeholder="Details of the login bug..." 
+                        isTextarea={true}
+                        containerClassName="form-group full-width"
                     />
-                    {errors.name && <span className="error">{errors.name.message}</span>}
                 </div>
 
-                <div className="form-group">
-                    <label>Priority</label>
-                    <input 
-                        type="text" 
-                        {...register('priority')} 
-                    />
-                    {errors.priority && <span className="error">{errors.priority.message}</span>}
+                <div className="ticket-form-actions">
+                    <button type="submit" className="primary-btn">Create Ticket</button>
                 </div>
-
-                <div className="form-group full-width">
-                    <label>Description</label>
-                    <textarea 
-                        placeholder="Detailed description..." 
-                        {...register('description')} 
-                    />
-                    {errors.description && <span className="error">{errors.description.message}</span>}
-                </div>
-            </div>
-
-            <div className="ticket-form-actions">
-                <button type="submit" className="primary-btn">Create Ticket</button>
-            </div>
-        </form>
+            </form>
+        </FormProvider>
     );
 };

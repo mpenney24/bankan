@@ -18,30 +18,6 @@ describe('Board', () => {
         expect(board.columns.length).toBe(h.TEST_BOARD_COLUMN_SCHEMA_KEYS.length);
     });
 
-    describe('#moveTicket', () => {
-
-        it('should successfully move a ticket from one column to another and add the ticket updated date', () => {
-            expect(tickBacklog.updated).toBe(undefined);
-
-            const originalColumn = board.getColumn(tickBacklog.columnId);
-            expect(originalColumn.stateId).toBe(h.COLUMN_STATE_ID_BACKLOG);
-            expect(originalColumn.tickets).toContain(tickBacklog);
-
-            board.moveTicket(tickBacklog.id, h.COLUMN_ID_IN_PROGRESS);
-
-            expect(originalColumn.tickets).not.toContain(tickBacklog);
-
-            const newColumn = board.getColumn(tickBacklog.columnId);
-            expect(newColumn.stateId).toBe(h.COLUMN_STATE_ID_IN_PROGRESS);
-            expect(newColumn.tickets).toContain(tickBacklog);
-
-            const ticket = board.getTicket(tickBacklog.id);
-            expect(ticket.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
-            expect(ticket.updated).not.toBe(undefined);
-        });
-        
-    });
-
     describe('#getColumn', () => {
         
         it('should successfully retrieve the stored column', () => {
@@ -72,6 +48,49 @@ describe('Board', () => {
             }).toThrow(ERROR_CODES.B01("UNKNOWN")); 
         });
 
+    });
+
+    describe('#addTicket', () => {
+
+        it('should successfully add the new ticket', () => {
+            const newTicket = h.createTicket(h.COLUMN_ID_BACKLOG);
+            board.addTicket(newTicket);
+            expect(board.columns.find(col => col.id === h.COLUMN_ID_BACKLOG)?.tickets.find(
+                tick => tick.id === newTicket.id
+            )).toStrictEqual(newTicket);
+        });
+
+        it('should throw an error if the target column cannot be found', () => {
+            const newTicket = h.createTicket(h.COLUMN_ID_INVALID);
+            expect(() => {
+                board.addTicket(newTicket)
+            }).toThrow(ERROR_CODES.B00(h.COLUMN_ID_INVALID)); 
+        });
+
+    });
+
+    describe('#moveTicket', () => {
+
+        it('should successfully move a ticket from one column to another and add the ticket updated date', () => {
+            expect(tickBacklog.updated).toBe(null);
+
+            const originalColumn = board.getColumn(tickBacklog.columnId);
+            expect(originalColumn.stateId).toBe(h.COLUMN_STATE_ID_BACKLOG);
+            expect(originalColumn.tickets).toContain(tickBacklog);
+
+            board.moveTicket(tickBacklog.id, h.COLUMN_ID_IN_PROGRESS);
+
+            expect(originalColumn.tickets).not.toContain(tickBacklog);
+
+            const newColumn = board.getColumn(tickBacklog.columnId);
+            expect(newColumn.stateId).toBe(h.COLUMN_STATE_ID_IN_PROGRESS);
+            expect(newColumn.tickets).toContain(tickBacklog);
+
+            const ticket = board.getTicket(tickBacklog.id);
+            expect(ticket.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
+            expect(ticket.updated).not.toBe(null);
+        });
+        
     });
 
 });

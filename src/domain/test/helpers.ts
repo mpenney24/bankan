@@ -70,5 +70,5 @@ export const createColumn = (
 };
 
 export const createTicket = (columnId: string) => {
-    return Ticket.create({columnId: columnId, name: 'Test Ticket', description: 'A test ticket',priority: 'HIGH' });
+    return Ticket.create({columnId: columnId, name: 'Test Ticket', description: 'A test ticket', priority: 'HIGH' });
 }

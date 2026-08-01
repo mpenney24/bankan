@@ -1,4 +1,5 @@
 import { Board } from '../../../domain/entities/Board.js';
+import { BoardSchema } from '../../../domain/entities/BoardSchema.js';
 import { getFirestoreDb } from './connection.js';
 import { FirestoreRepository } from './FirestoreRepository.js';
 
@@ -8,6 +9,7 @@ export class Repositories {
     public static readonly board = new FirestoreRepository(
         Repositories.db, 
         'boards', 
-        Board
+        Board,
+        BoardSchema
     );
 }

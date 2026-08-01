@@ -2,10 +2,11 @@ import { Column } from "./Column.js";
 import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { Ticket } from "./Ticket.js";
 import { Exclude, Expose, Type } from "class-transformer";
+import { IBoard } from "./BoardSchema.js";
 
 // DDD - Aggregate root
 @Exclude()
-export class Board {
+export class Board implements IBoard {
     
     @Expose({ name: 'columns' })
     @Type(() => Column)
@@ -28,7 +29,7 @@ export class Board {
     }
 
     public getTicket(ticketId: string): Ticket {
-        for(const column of this.columns.values()) {
+        for(const column of this._columns) {
             const ticket = column.tickets.find(t => t.id === ticketId);
             if (ticket) {
                 return ticket;

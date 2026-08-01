@@ -9,8 +9,9 @@ import {
     onSnapshot
 } from "firebase/firestore";
 import { createFirestoreConverter } from "./firestoreConverter.js";
-import { ClassConstructor, instanceToPlain, plainToInstance } from "class-transformer";
+import { ClassConstructor, instanceToInstance } from "class-transformer";
 import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
+import { ZodType } from "zod";
 
 export interface Identifiable {
     readonly id: string;
@@ -22,16 +23,16 @@ export class FirestoreRepository<T extends Identifiable> {
     constructor(
         private readonly db: Firestore, 
         collectionName: string,
-        private entityClass: ClassConstructor<T>
+        entityClass: ClassConstructor<T>,
+        entitySchema: ZodType<any>
     ) {
         this.documents = collection(this.db, collectionName).withConverter(
-            createFirestoreConverter(entityClass)
+            createFirestoreConverter(entityClass, entitySchema)
         ) as CollectionReference<T>;
     }
 
     public clone(entity: T): T {
-        const plainData = instanceToPlain(entity);
-        return plainToInstance(this.entityClass, plainData);
+        return instanceToInstance(entity);
     }
 
     public subscribe(id: string, callback: (entity: T | null) => void): () => void {
@@ -52,7 +53,7 @@ export class FirestoreRepository<T extends Identifiable> {
         return querySnapshot.docs.map(docSnap => docSnap.data());
     }
 
-        public async getById(id: string): Promise<T | null> {
+    public async getById(id: string): Promise<T | null> {
         if (!id || id.trim() === '') throw new Error(ERROR_CODES.F00);
     
         const docRef = doc(this.documents, id);
