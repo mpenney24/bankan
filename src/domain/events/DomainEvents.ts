@@ -21,6 +21,10 @@ export class TicketAddedEvent implements DomainEvent {
     public getAggregateId(): string {
         return this.payload.boardId;
     }
+
+    public static create(payload: ITicketEventPayload) {
+        return new TicketAddedEvent(payload);
+    }
 }
 
 export class TicketMovedEvent implements DomainEvent {
@@ -33,5 +37,9 @@ export class TicketMovedEvent implements DomainEvent {
 
     public getAggregateId(): string {
         return this.payload.boardId;
+    }
+
+    public static create(payload: ITicketEventPayload, targetColumnId: string) {
+        return new TicketMovedEvent(payload, targetColumnId);
     }
 }

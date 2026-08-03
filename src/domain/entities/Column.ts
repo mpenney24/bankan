@@ -36,6 +36,8 @@ export class Column implements IColumn {
     @Expose() get tickets(): Ticket[] { return Array.from(this._tickets.values()); }
     private set tickets(tickets: Ticket[]) { this._tickets = tickets; }
 
+    // Mitch - make these accessible only by Board?
+
     public addTicket(ticket: Ticket): void {
         if (!this._tickets.find(t => t.id === ticket.id)) {
             this._tickets.push(ticket);

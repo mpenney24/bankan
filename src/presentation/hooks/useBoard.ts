@@ -4,6 +4,7 @@ import { Board } from '../../domain/entities/Board.js';
 import { ERROR_CODES } from '../../errors/ErrorCodes.js';
 import { ICreateTicket, IMoveTicket } from '../../domain/entities/TicketSchema.js';
 import { useServices } from '../services/ServiceContext.js';
+import { Result } from '../../domain/common/Result.js';
 
 export function useBoard(boardId: string) {
     const { ticketService, boardRepository } = useServices();
@@ -21,30 +22,34 @@ export function useBoard(boardId: string) {
     }, [boardId]);
 
     const updateBoard = async (
-        update: (mutatedBoard: Board) => Promise<void>
+        update: (boardToMutate: Board) => Promise<Result<void>>
     ) => {
         if (!board) return;
-        
-        const mutatedBoard = board.clone();
 
-        try {
-            await update(mutatedBoard);
-        } catch (err) {
-            console.error(ERROR_CODES.UIB01, err);
-            toast.error('Failed to update board, rolling back...');
+        const col = board.columns[0]!
+        col.removeTicket('a');
+        
+        const boardToMutate = board.clone();
+
+        const result = await update(boardToMutate);
+
+        if(result.isFailure) {
+            // Mitch - update codes/messages
+            console.error(ERROR_CODES.UIB01, result.error);
+            toast.error(ERROR_CODES.UIB01);
             setBoard(board);
         }
     }
 
     const handleTicketDrop = useCallback(async (payload: IMoveTicket) => {
-        await updateBoard((mutatedBoard) => 
-            ticketService.moveTicket(mutatedBoard, payload.ticketId, payload.targetColumnId)
+        await updateBoard((boardToMutate) => 
+            ticketService.moveTicket(boardToMutate, payload.ticketId, payload.targetColumnId)
         );
     }, [board, ticketService]);
 
     const handleAddTicket = useCallback(async (payload: ICreateTicket) => {
-        await updateBoard((mutatedBoard) => 
-            ticketService.addTicket(mutatedBoard, payload)
+        await updateBoard((boardToMutate) => 
+            ticketService.addTicket(boardToMutate, payload)
         );
     }, [board, ticketService]);
 

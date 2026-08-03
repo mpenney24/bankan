@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Ticket } from '../../domain/entities/Ticket.js';
 import { TicketComponent } from './TicketComponent.js';
+import { Result } from '../../domain/common/Result.js';
+import { ERROR_CODES } from '../../errors/ErrorCodes.js';
 
 interface Props {
     columnId: string;
     title: string;
-    tickets: Ticket[];
+    tickets: Result<Ticket[]>;
     onTicketDrop: (ticketId: string, targetColumnId: string) => void;
 }
 
@@ -47,9 +49,13 @@ export const ColumnComponent: React.FC<Props> = React.memo(({ columnId, title, t
         >
             <div className="column-header">{title}</div>
             <div className="ticket-list">
-                {tickets.map((ticket) => (
-                    <TicketComponent key={ticket.id} ticket={ticket} />
-                ))}
+                {tickets.isSuccess ? (
+                    tickets.value.map((ticket) => (
+                        <TicketComponent key={ticket.id} ticket={ticket} />
+                    ))
+                ) : (
+                    <div>{ERROR_CODES.UIT02}</div>
+                )}
             </div>
         </div>
     );

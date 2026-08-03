@@ -2,19 +2,21 @@ import { randomUUID } from "crypto";
 import { Board } from "../entities/Board.js";
 import { Column } from "../entities/Column.js";
 import { Ticket } from "../entities/Ticket.js";
+import { ICreateTicket } from "../entities/TicketSchema.js";
 
 // KEY LOGIC
-
-export const COLUMN_STATE_ID_BACKLOG: string = 'BACKLOG';
-export const COLUMN_STATE_ID_IN_PROGRESS: string = 'IN_PROGRESS';
-export const COLUMN_STATE_ID_DONE: string = 'DONE';
 
 export const COLUMN_ID_BACKLOG: string = randomUUID();
 export const COLUMN_ID_IN_PROGRESS: string = randomUUID();
 export const COLUMN_ID_DONE: string = randomUUID();
 
-export const COLUMN_STATE_ID_INVALID: string = 'INVALID';
 export const COLUMN_ID_INVALID: string = randomUUID();
+
+export const COLUMN_STATE_ID_BACKLOG: string = 'BACKLOG';
+export const COLUMN_STATE_ID_IN_PROGRESS: string = 'IN_PROGRESS';
+export const COLUMN_STATE_ID_DONE: string = 'DONE';
+
+export const COLUMN_STATE_ID_INVALID: string = 'INVALID';
 
 // SCHEMA LOGIC
 
@@ -70,5 +72,9 @@ export const createColumn = (
 };
 
 export const createTicket = (columnId: string) => {
-    return Ticket.create({columnId: columnId, name: 'Test Ticket', description: 'A test ticket', priority: 'HIGH' });
+    return Ticket.create(createTicketPayload(columnId));
+}
+
+export const createTicketPayload = (columnId: string): ICreateTicket => {
+    return { name: 'Test Ticket', columnId, description: 'A test ticket', priority: 'HIGH' }
 }

@@ -66,7 +66,7 @@ export const BoardView: React.FC = () => {
                         key={col.id}
                         columnId={col.id}
                         title={col.displayName}
-                        tickets={board.getColumn(col.id).tickets}
+                        tickets={board.getTickets(col.id)}
                         onTicketDrop={(ticketId, targetColumnId) => handleTicketDrop({ ticketId, targetColumnId })}
                     />
                 ))}

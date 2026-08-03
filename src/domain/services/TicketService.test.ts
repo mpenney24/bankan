@@ -1,86 +1,109 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as h from "../test/helpers.js";
 import { TicketService } from "./TicketService.js";
 import { Board } from "../entities/Board.js";
 import { Ticket } from "../entities/Ticket.js";
+import { FirestoreRepository } from "../../infrastructure/persistence/firestore/FirestoreRepository.js";
+import { DomainEventDispatcher } from "../events/DomainEventDispatcher.js";
+import { afterEach } from "node:test";
+import { Column } from "../entities/Column.js";
+import { ICreateTicket, ITicket } from "../entities/TicketSchema.js";
 
 describe('TicketService', () => {
 
-    // Mitch - NEED TO FIX THESE!
-    // const ticketService = new TicketService();
+    let ticketService: TicketService;
+    let mockBoardRepository: FirestoreRepository<Board>;
+    let mockEventDispatcher: DomainEventDispatcher;
 
-    // let board: Board;
-    // let tickBacklog: Ticket;
-    // let tickInProgress: Ticket;
-    // let tickDone: Ticket;
+    let board: Board;
+    let columnBacklog: Column;
+    let ticketBacklog: Ticket;
 
-    // beforeEach(() => {
-    //     board = h.createBoard();
-    //     tickBacklog = board.getColumn(h.COLUMN_ID_BACKLOG).tickets[0]!;
-    //     tickInProgress = board.getColumn(h.COLUMN_ID_IN_PROGRESS).tickets[0]!;
-    //     tickDone = board.getColumn(h.COLUMN_ID_DONE).tickets[0]!;
-    // });
+    const FIXED_DATE = new Date('2026-06-01T12:00:00Z');
 
-    // describe('#regressTicket', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(FIXED_DATE);
+
+        mockBoardRepository = {
+            save: vi.fn().mockResolvedValue(undefined),
+        } as unknown as FirestoreRepository<Board>;
+
+        mockEventDispatcher = {
+            dispatch: vi.fn().mockResolvedValue(undefined),
+        } as unknown as DomainEventDispatcher;
+
+        ticketService = new TicketService(mockBoardRepository, mockEventDispatcher);
+
+        board = h.createBoard();
+        columnBacklog = board.columns.find(col => col.id === h.COLUMN_ID_BACKLOG)!;
+        ticketBacklog = columnBacklog.tickets[0]!;
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    describe('#moveTicket', () => {
         
-    //     it('should successfully prevent a ticket in BACKLOG from regressing to a non-existent column', () => {
-    //         expect(tickBacklog.columnId).toBe(h.COLUMN_ID_BACKLOG);
-
-    //         TicketService.regressTicket(board, tickBacklog.id);
+        it('should report a ticket successfully moved column with an event dispatch and db persist', async () => {
+            const result = await ticketService.moveTicket(board, ticketBacklog.id, h.COLUMN_ID_IN_PROGRESS);
             
-    //         expect(tickBacklog.columnId).toBe(h.COLUMN_ID_BACKLOG);
-    //         expect(tickBacklog.updated).toBe(null);
-    //     });
+            expect(result.isSuccess).toBe(true);
 
-    //     it('should successfully regress a ticket in IN_PROGRESS to BACKLOG', () => {
-    //         expect(tickInProgress.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
+            expect(ticketBacklog.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
+            expect(ticketBacklog.updated).toBe(FIXED_DATE.toISOString());
 
-    //         TicketService.regressTicket(board, tickInProgress.id);
+            expect(mockBoardRepository.save).toHaveBeenCalledWith(board);
+            expect(mockEventDispatcher.dispatch).toHaveBeenCalledOnce();
+        });
+
+        it('should report a ticket failed to move column with no event dispatch or db persist', async () => {
+            const result = await ticketService.moveTicket(board, ticketBacklog.id, h.COLUMN_ID_INVALID);
             
-    //         expect(tickInProgress.columnId).toBe(h.COLUMN_ID_BACKLOG);
-    //         expect(tickInProgress.updated).not.toBe(null);
-    //     });
+            expect(result.isFailure).toBe(true);
 
-    //     it('should successfully regress a ticket in DONE to IN_PROGRESS', () => {
-    //         expect(tickDone.columnId).toBe(h.COLUMN_ID_DONE);
+            expect(ticketBacklog.columnId).toBe(h.COLUMN_ID_BACKLOG);
+            expect(ticketBacklog.updated).toBe(null);
 
-    //         TicketService.regressTicket(board, tickDone.id);
+            expect(mockBoardRepository.save).not.toHaveBeenCalledWith(board);
+            expect(mockEventDispatcher.dispatch).not.toHaveBeenCalled();
+        });
+
+    });
+
+    describe('#addTicket', () => {
+
+        it('should report a ticket successfully added to column with an event dispatch and db persist', async () => {
+            const ticketCount = columnBacklog.tickets.length;
+            const newTicket: ICreateTicket = h.createTicketPayload(h.COLUMN_ID_BACKLOG);
+            const result = await ticketService.addTicket(board, newTicket);
             
-    //         expect(tickDone.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
-    //         expect(tickDone.updated).not.toBe(null);
-    //     });
+            expect(result.isSuccess).toBe(true);
+            expect(columnBacklog.tickets.length === ticketCount + 1);
 
-    // });
+            const savedNewTicket = columnBacklog.tickets.find(tick => tick.name === newTicket.name)!;
 
-    // describe('#progressTicket', () => {
+            expect(savedNewTicket).toBeDefined();
+            expect(savedNewTicket.updated).toBe(null);
 
-    //     it('should successfully progress a ticket in BACKLOG to IN_PROGRESS', () => {
-    //         expect(tickBacklog.columnId).toBe(h.COLUMN_ID_BACKLOG);
+            expect(mockBoardRepository.save).toHaveBeenCalledWith(board);
+            expect(mockEventDispatcher.dispatch).toHaveBeenCalledOnce();
+        });
 
-    //         TicketService.progressTicket(board, tickBacklog.id);
+        it('should report a ticket failed to add to column with no event dispatch or db persist', async () => {
+            const newTicket = h.createTicket(h.COLUMN_ID_INVALID);
+            const result = await ticketService.addTicket(board, newTicket);
             
-    //         expect(tickBacklog.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
-    //         expect(tickBacklog.updated).not.toBe(null);
-    //     });
+            expect(result.isFailure).toBe(true);
 
-    //     it('should successfully progress a ticket in IN_PROGRESS to DONE', () => {
-    //         expect(tickInProgress.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
+            expect(columnBacklog.tickets).not.toContain(newTicket);
+            expect(newTicket.updated).toBe(null);
 
-    //         TicketService.progressTicket(board, tickInProgress.id);
-            
-    //         expect(tickInProgress.columnId).toBe(h.COLUMN_ID_DONE);
-    //         expect(tickInProgress.updated).not.toBe(null);
-    //     });
+            expect(mockBoardRepository.save).not.toHaveBeenCalledWith(board);
+            expect(mockEventDispatcher.dispatch).not.toHaveBeenCalled();
+        });
 
-    //     it('should successfully prevent a ticket in DONE from progressing to a non-existent column', () => {
-    //         expect(tickDone.columnId).toBe(h.COLUMN_ID_DONE);
-
-    //         TicketService.progressTicket(board, tickDone.id);
-            
-    //         expect(tickDone.columnId).toBe(h.COLUMN_ID_DONE);
-    //         expect(tickDone.updated).toBe(null);
-    //     });
-
-    // });
+    });
 
 });

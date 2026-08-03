@@ -19,7 +19,7 @@ describe('createFirestoreConverter', () => {
 
     beforeEach(() => {
         board = h.createBoard();
-        column = board.getColumn(h.COLUMN_ID_BACKLOG);
+        column = board.columns.find(col => col.id === h.COLUMN_ID_BACKLOG)!;
         ticket = column.tickets[0]!;
     });
 

@@ -1,70 +1,89 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import * as h from "../test/helpers.js";
 import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { Board } from "./Board.js";
 import { Ticket } from "./Ticket.js";
+import { Column } from "./Column.js";
+import { DomainEvent, TicketAddedEvent, TicketMovedEvent } from "../events/DomainEvents.js";
+import { ClassConstructor } from "class-transformer";
+
+function validateBoardEvent<T extends DomainEvent>(board: Board, expectedEvent: T) {
+    const events = board.getDomainEvents();
+    expect(events.length).toBe(1);
+
+    const clazz = expectedEvent.constructor as ClassConstructor<T>;
+    expect(events[0] instanceof clazz).toBe(true);
+    
+    expect(events[0]!).toStrictEqual(expectedEvent);
+}
 
 describe('Board', () => {
     
     let board: Board;
-    let tickBacklog: Ticket;
+    let column: Column;
+    let ticket: Ticket;
+
+    const FIXED_DATE = new Date('2026-06-01T12:00:00Z');
 
     beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(FIXED_DATE);
+
         board = h.createBoard();
-        tickBacklog = board.getColumn(h.COLUMN_ID_BACKLOG).tickets[0]!;
+        column = board.columns.find(col => col.id === h.COLUMN_ID_BACKLOG)!;
+        ticket = board.getTickets(column.id).value[0]!;
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('should successfully instantiate the board', () => {
         expect(board.columns.length).toBe(h.TEST_BOARD_COLUMN_SCHEMA_KEYS.length);
     });
 
-    describe('#getColumn', () => {
-        
-        it('should successfully retrieve the stored column', () => {
-            expect(board.columns.find(col => col.stateId === h.COLUMN_STATE_ID_BACKLOG)).toStrictEqual(
-                board.getColumn(h.COLUMN_ID_BACKLOG)
-            );
+    describe('#getTickets', () => {
+
+        it('should successfully return the stored tickets for the target column', () => {
+            const result = board.getTickets(column.id);
+            expect(result.isSuccess).toBe(true);
+            expect(result.value).toStrictEqual([ticket]);
         });
 
-        it('should throw an error if the column cannot be found', () => {
-            expect(() => {
-                board.getColumn(h.COLUMN_ID_INVALID)
-            }).toThrow(ERROR_CODES.B00(h.COLUMN_ID_INVALID)); 
+        it('should fail to return stored tickets if the target column cannot be found', () => {
+            const result = board.getTickets(h.COLUMN_ID_INVALID);
+            expect(result.isFailure).toBe(true);
+            expect(result.error).toBe(ERROR_CODES.B00(h.COLUMN_ID_INVALID));
         });
-
-    });
-
-    describe('#getTicket', () => {
-
-        it('should successfully retrieve the stored ticket', () => {
-            expect(board.getTicket(tickBacklog.id)).toStrictEqual(
-                tickBacklog
-            );
-        });
-
-        it('should throw an error if the ticket cannot be found', () => {
-            expect(() => {
-                board.getTicket("UNKNOWN")
-            }).toThrow(ERROR_CODES.B01("UNKNOWN")); 
-        });
-
     });
 
     describe('#addTicket', () => {
 
         it('should successfully add the new ticket', () => {
             const newTicket = h.createTicket(h.COLUMN_ID_BACKLOG);
-            board.addTicket(newTicket);
+
+            const result = board.addTicket(newTicket);
+            expect(result.isSuccess).toBe(true);
+
             expect(board.columns.find(col => col.id === h.COLUMN_ID_BACKLOG)?.tickets.find(
                 tick => tick.id === newTicket.id
             )).toStrictEqual(newTicket);
+
+            const expectedEvent = TicketAddedEvent.create({
+                    ticketId: newTicket.id,
+                    boardId: board.id
+                }
+            );
+            validateBoardEvent(board, expectedEvent);
         });
 
-        it('should throw an error if the target column cannot be found', () => {
+        it('should fail to add a new ticket if the target column cannot be found', () => {
             const newTicket = h.createTicket(h.COLUMN_ID_INVALID);
-            expect(() => {
-                board.addTicket(newTicket)
-            }).toThrow(ERROR_CODES.B00(h.COLUMN_ID_INVALID)); 
+
+            const result = board.addTicket(newTicket);
+            expect(result.isFailure).toBe(true);
+
+            expect(result.error).toBe(ERROR_CODES.UIT01); 
         });
 
     });
@@ -72,23 +91,31 @@ describe('Board', () => {
     describe('#moveTicket', () => {
 
         it('should successfully move a ticket from one column to another and add the ticket updated date', () => {
-            expect(tickBacklog.updated).toBe(null);
+            expect(ticket.updated).toBe(null);
 
-            const originalColumn = board.getColumn(tickBacklog.columnId);
-            expect(originalColumn.stateId).toBe(h.COLUMN_STATE_ID_BACKLOG);
-            expect(originalColumn.tickets).toContain(tickBacklog);
+            const originalColumn = board.columns.find(col => col.id === ticket.columnId)!;
+            expect(originalColumn.id).toBe(h.COLUMN_ID_BACKLOG);
+            expect(originalColumn.tickets).toContain(ticket);
 
-            board.moveTicket(tickBacklog.id, h.COLUMN_ID_IN_PROGRESS);
+            const result = board.moveTicket(ticket.id, h.COLUMN_ID_IN_PROGRESS);
+            expect(result.isSuccess).toBe(true);
 
-            expect(originalColumn.tickets).not.toContain(tickBacklog);
+            expect(originalColumn.tickets).not.toContain(ticket);
 
-            const newColumn = board.getColumn(tickBacklog.columnId);
-            expect(newColumn.stateId).toBe(h.COLUMN_STATE_ID_IN_PROGRESS);
-            expect(newColumn.tickets).toContain(tickBacklog);
+            const newColumn = board.columns.find(col => col.id === ticket.columnId)!;
+            expect(newColumn.id).toBe(h.COLUMN_ID_IN_PROGRESS);
+            expect(newColumn.tickets).toContain(ticket);
 
-            const ticket = board.getTicket(tickBacklog.id);
             expect(ticket.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
             expect(ticket.updated).not.toBe(null);
+
+            const expectedEvent = TicketMovedEvent.create({
+                    ticketId: ticket.id,
+                    boardId: board.id
+                },
+                newColumn.id
+            );
+            validateBoardEvent(board, expectedEvent);
         });
         
     });
