@@ -12,10 +12,13 @@ import { createFirestoreConverter } from "./firestoreConverter.js";
 import { ClassConstructor } from "class-transformer";
 import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
 import { ZodType } from "zod";
+import { Result } from "../../../domain/common/Result.js";
 
 export interface Identifiable {
     readonly id: string;
 }
+
+export type EntitySubscriptionCallback<T> = (entity: T | null) => void;
 
 export class FirestoreRepository<T extends Identifiable> {
     private readonly documents: CollectionReference<T>;
@@ -31,7 +34,7 @@ export class FirestoreRepository<T extends Identifiable> {
         ) as CollectionReference<T>;
     }
 
-    public subscribe(id: string, callback: (entity: T | null) => void): () => void {
+    public subscribe(id: string, callback: EntitySubscriptionCallback<T>) {
         const docRef = doc(this.documents, id);
         
         return onSnapshot(docRef, (snapshot) => {
@@ -49,13 +52,13 @@ export class FirestoreRepository<T extends Identifiable> {
         return querySnapshot.docs.map(docSnap => docSnap.data());
     }
 
-    public async getById(id: string): Promise<T | null> {
+    public async getById(id: string): Promise<Result<T>> {
         if (!id || id.trim() === '') throw new Error(ERROR_CODES.F00);
     
         const docRef = doc(this.documents, id);
         const snapshot = await getDoc(docRef);
         
-        if (!snapshot.exists()) throw new Error(ERROR_CODES.F01(id));
-        return snapshot.data();
+        if (!snapshot.exists()) return Result.fail(ERROR_CODES.F01(id));
+        return Result.ok(snapshot.data());
     }
 }

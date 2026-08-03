@@ -4,6 +4,10 @@ import { Column } from "../entities/Column.js";
 import { Ticket } from "../entities/Ticket.js";
 import { ICreateTicket } from "../entities/TicketSchema.js";
 
+export const mock = <T>(implementation: Partial<T>): T => {
+    return implementation as T;
+}
+
 // KEY LOGIC
 
 export const COLUMN_ID_BACKLOG: string = randomUUID();

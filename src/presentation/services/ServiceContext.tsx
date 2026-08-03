@@ -1,11 +1,8 @@
 import { createContext, useContext } from 'react';
-import { TicketService } from '../../domain/services/TicketService.js';
-import { FirestoreRepository } from '../../infrastructure/persistence/firestore/FirestoreRepository.js';
-import { Board } from '../../domain/entities/Board.js';
+import { BoardServiceFacade } from '../../domain/application/facades/BoardServiceFacade.js';
 
 interface ServiceContainer {
-    ticketService: TicketService,
-    boardRepository: FirestoreRepository<Board>
+    boardServiceFacade: BoardServiceFacade
 }
 
 const ServiceContext = createContext<ServiceContainer | null>(null);

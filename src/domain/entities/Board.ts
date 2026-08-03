@@ -1,7 +1,7 @@
 import { Column } from "./Column.js";
 import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { Ticket } from "./Ticket.js";
-import { Exclude, Expose, instanceToInstance, Type } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 import { IBoardInternal } from "./BoardSchema.js";
 import { TicketAddedEvent, TicketMovedEvent } from "../events/DomainEvents.js";
 import { DomainEventAggregateRoot } from "../events/DomainEventAggregateRoot.js";
@@ -26,10 +26,6 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
 
     @Expose() get columns(): ReadonlyArray<Column> { return this._columns; }
     private set columns(columns: Column[]) { this._columns = columns }
-
-    public clone(): Board {
-        return instanceToInstance(this);
-    }
 
     public getTickets(targetColumnId: string): Result<ReadonlyArray<Ticket>> {
         const column = this._getColumn(targetColumnId);

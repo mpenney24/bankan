@@ -79,11 +79,10 @@ describe('createFirestoreConverter', () => {
                 strategy: 'excludeAll'
             });
 
-            const mockSnapshot = {
+            const mockSnapshot = h.mock<QueryDocumentSnapshot>({
                 id: modelInstance.id,
-                exists: true,
                 data: () => plainData,
-            } as unknown as QueryDocumentSnapshot; 
+            }); 
 
             const object = converter.fromFirestore(mockSnapshot);
 
