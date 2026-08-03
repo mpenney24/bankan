@@ -12,7 +12,7 @@ describe('Ticket', () => {
             expect(tick.columnId).toBe(h.COLUMN_ID_BACKLOG);
             expect(tick.updated).toBe(null);
             
-            tick.transitionTo(h.COLUMN_ID_IN_PROGRESS);
+            tick._transitionTo(h.COLUMN_ID_IN_PROGRESS);
             
             expect(tick.columnId).toBe(h.COLUMN_ID_IN_PROGRESS);
             expect(tick.created).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)

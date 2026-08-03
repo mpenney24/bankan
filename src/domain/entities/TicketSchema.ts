@@ -24,4 +24,9 @@ export const TicketSchema = CreateTicketSchema.extend({
 });
 
 export type ITicket = z.infer<typeof TicketSchema>;
+export type ITicketReadOnly = Readonly<ITicket>;
+
+export interface ITicketInternal extends ITicketReadOnly {
+    _transitionTo(newColumnId: string): void;
+}
 

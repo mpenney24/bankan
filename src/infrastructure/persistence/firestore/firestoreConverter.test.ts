@@ -79,8 +79,6 @@ describe('createFirestoreConverter', () => {
                 strategy: 'excludeAll'
             });
 
-            // Mitch - need to check tests here that it's not including/converting the undefined fields!
-
             const mockSnapshot = {
                 id: modelInstance.id,
                 exists: true,

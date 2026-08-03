@@ -7,7 +7,7 @@ import { ERROR_CODES } from '../../errors/ErrorCodes.js';
 interface Props {
     columnId: string;
     title: string;
-    tickets: Result<Ticket[]>;
+    tickets: Result<ReadonlyArray<Ticket>>;
     onTicketDrop: (ticketId: string, targetColumnId: string) => void;
 }
 

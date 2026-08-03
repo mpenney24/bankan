@@ -1,10 +1,10 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { Ticket } from "./Ticket.js";
-import { IColumn } from "./ColumnSchema.js";
+import { IColumnInternal } from "./ColumnSchema.js";
 
 // DDD - Entity
 @Exclude()
-export class Column implements IColumn {
+export class Column implements IColumnInternal {
 
     @Expose({ name: 'tickets' })
     @Type(() => Ticket)
@@ -33,18 +33,16 @@ export class Column implements IColumn {
     @Expose() get nextColumnId(): string | null { return this._nextColumnId; }
     private set nextColumnId(nextColumnId: string) { this._nextColumnId = nextColumnId; }
 
-    @Expose() get tickets(): Ticket[] { return Array.from(this._tickets.values()); }
+    @Expose() get tickets(): ReadonlyArray<Ticket> { return this._tickets; }
     private set tickets(tickets: Ticket[]) { this._tickets = tickets; }
 
-    // Mitch - make these accessible only by Board?
-
-    public addTicket(ticket: Ticket): void {
+    public _addTicket(ticket: Ticket): void {
         if (!this._tickets.find(t => t.id === ticket.id)) {
             this._tickets.push(ticket);
         }
     }
 
-    public removeTicket(ticketId: string): void {
+    public _removeTicket(ticketId: string): void {
         this.tickets = this._tickets.filter(t => t.id !== ticketId);
     }
 }

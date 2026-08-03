@@ -51,8 +51,8 @@ export const createBoard = (): Board => {
     
     TEST_BOARD_COLUMN_SCHEMA_KEYS.forEach(stateId => {
         const col = createColumn(stateId);
-        col.addTicket(createTicket(col.id));
-        board.columns.push(col);
+        col._addTicket(createTicket(col.id));
+        board._addColumn(col);
     });
     
     return board;

@@ -18,7 +18,7 @@ describe('Column', () => {
         it('should successfully add a new ticket', () => { 
             expect(column.tickets).toHaveLength(0);
 
-            column.addTicket(ticket);
+            column._addTicket(ticket);
 
             expect(column.tickets).toHaveLength(1);
             expect(column.tickets).toContain(ticket);
@@ -27,8 +27,8 @@ describe('Column', () => {
         it('should not duplicate tickets of the same id', () => {
             expect(column.tickets).toHaveLength(0);
 
-            column.addTicket(ticket);
-            column.addTicket(ticket);
+            column._addTicket(ticket);
+            column._addTicket(ticket);
 
             expect(column.tickets).toHaveLength(1);
             expect(column.tickets).toContain(ticket);
@@ -41,12 +41,12 @@ describe('Column', () => {
         it('should successfully remove the ticket if it exists', () => {
             expect(column.tickets).toHaveLength(0);
 
-            column.addTicket(ticket);
+            column._addTicket(ticket);
 
             expect(column.tickets).toHaveLength(1);
             expect(column.tickets).toContain(ticket);
 
-            column.removeTicket(ticket.id);
+            column._removeTicket(ticket.id);
 
             expect(column.tickets).toHaveLength(0);
             expect(column.tickets).not.toContain(ticket);

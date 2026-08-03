@@ -1,8 +1,8 @@
 import { Expose } from "class-transformer";
-import { ITicket } from "./TicketSchema.js";
+import { ITicket, ITicketInternal } from "./TicketSchema.js";
 
 // DDD - Entity
-export class Ticket implements ITicket {
+export class Ticket implements ITicketInternal {
 
     private _id: string;
     private _columnId: string;
@@ -43,7 +43,7 @@ export class Ticket implements ITicket {
     @Expose() get updated(): string | null { return this._updated; }
     set updated(updated: string) { this._updated = updated; }
 
-    public transitionTo(newColumnId: string): void {
+    public _transitionTo(newColumnId: string): void {
         this._columnId = newColumnId;
         this._updated = new Date().toISOString();
     }
