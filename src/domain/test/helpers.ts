@@ -50,8 +50,10 @@ export const TEST_BOARD_COLUMN_SCHEMA_KEYS = Object.keys(TEST_BOARD_COLUMN_SCHEM
 
 // CREATION LOGIC
 
+export const VERSION = 0;
+
 export const createBoard = (): Board => {
-    const board = new Board(randomUUID());
+    const board = new Board(randomUUID(), VERSION);
     
     TEST_BOARD_COLUMN_SCHEMA_KEYS.forEach(stateId => {
         const col = createColumn(stateId);

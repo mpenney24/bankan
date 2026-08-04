@@ -16,7 +16,8 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
     private _columns: Column[] = [];
 
     constructor(
-        private _id: string
+        private _id: string,
+        private _version: number
     ) {
         super();
     }
@@ -26,6 +27,9 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
 
     @Expose() get columns(): ReadonlyArray<Column> { return this._columns; }
     private set columns(columns: Column[]) { this._columns = columns }
+
+    @Expose() get version(): number { return this._version; }
+    private set version(version: number) { this._version = version }
 
     public getTickets(targetColumnId: string): Result<ReadonlyArray<Ticket>> {
         const column = this._getColumn(targetColumnId);

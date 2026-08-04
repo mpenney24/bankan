@@ -13,10 +13,9 @@ export const persistAndDispatch = async<T extends Identifiable & DomainEventProd
         // await new Promise((resolve) => setTimeout(resolve, 1000));
         // throw new Error("Simulated network failure");
 
-        try {
-            await repo.save(entity);
-        } catch (error) {
-            console.error(ERROR_CODES.UIB01, error);
+        const result = await repo.save(entity);
+        if(result.isFailure) {
+            console.error(ERROR_CODES.UIB01, result.error);
             return Result.fail("A network error occurred while saving. Please try again.");
         }
 

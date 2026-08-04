@@ -5,6 +5,7 @@ import { Ticket } from './Ticket.js';
 import { Column } from './Column.js';
 
 export const BoardSchema = z.object({
+    version: z.number().default(0),
     id: z.uuid(),
     columns: z.array(ColumnSchema).readonly()
 });
