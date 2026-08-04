@@ -6,7 +6,7 @@ import {
     getDoc, 
     getDocs, 
     onSnapshot,
-    runTransaction
+    setDoc
 } from "firebase/firestore";
 import { createFirestoreConverter } from "./firestoreConverter.js";
 import { ClassConstructor } from "class-transformer";
@@ -45,23 +45,12 @@ export class FirestoreRepository<T extends Identifiable> {
 
     public async save(entity: T): Promise<Result<void>> {
         const docRef = doc(this.documents, entity.id);
+
+        if(entity.version) entity.version++;
         
         try {
-            await runTransaction(this.db, async (transaction) => {
-                const doc = await transaction.get(docRef);
-                const currentData = doc.data();
-                
-                const currentVersion = currentData?.version ?? 0;
-
-                if (entity.version && currentVersion !== entity.version) {
-                    throw new Error("ConcurrencyConflict: This board was modified by another user. Please refresh.");
-                }
-
-                entity.version = currentVersion + 1;
-
-                transaction.set(docRef, entity);
-            });
-
+            await setDoc(docRef, entity);
+            
             return Result.ok();
         } catch (error: any) {
             console.log(error.message);

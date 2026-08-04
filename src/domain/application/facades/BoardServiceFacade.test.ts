@@ -41,7 +41,7 @@ describe('BoardServiceFacade', () => {
         ticketBacklog = columnBacklog.tickets[0]!;
 
         mockBoardRepository = h.mock<FirestoreRepository<Board>>({
-            save: vi.fn().mockResolvedValue(undefined),
+            save: vi.fn().mockResolvedValue(Result.ok()),
             getById: vi.fn().mockResolvedValue(Result.ok(board))
         });
 
