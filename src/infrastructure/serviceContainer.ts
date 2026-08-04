@@ -8,6 +8,7 @@ import { GetBoardHandler } from '../domain/application/queries/GetBoardHandler.j
 import { MoveTicketHandler } from '../domain/application/commands/MoveTicketHandler.js';
 import { AddTicketHandler } from '../domain/application/commands/AddTicketHandler.js';
 import { BoardServiceFacade } from '../domain/application/facades/BoardServiceFacade.js';
+import { BoardSummaryProjector, BoardSummaryReadModel } from '../domain/events/BoardSummaryProjector.js';
 
 const eventDispatcher = new InMemoryEventDispatcher();
 registerDomainEvents(eventDispatcher);
@@ -29,3 +30,11 @@ export const boardServiceFacade = new BoardServiceFacade(
     moveTicketHandler,
     addTicketHandler
 );
+
+const boardSummaryRepository = new FirestoreRepository<BoardSummaryReadModel>(
+    getFirestoreDb(),
+    'board_summaries'
+);
+
+const boardSummaryProjector = new BoardSummaryProjector(boardRepository, boardSummaryRepository);
+boardSummaryProjector.start();

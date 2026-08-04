@@ -1,8 +1,8 @@
-import { Result } from "../../../domain/common/Result.js";
-import { DomainEventDispatcher } from "../../../domain/events/DomainEventDispatcher.js";
-import { DomainEventProducer } from "../../../domain/events/DomainEvents.js";
-import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
-import { FirestoreRepository, Identifiable } from "./FirestoreRepository.js";
+import { Result } from "../../domain/common/Result.js";
+import { DomainEventDispatcher } from "../../domain/events/DomainEventDispatcher.js";
+import { DomainEventProducer } from "../../domain/events/DomainEvents.js";
+import { ERROR_CODES } from "../../errors/ErrorCodes.js";
+import { FirestoreRepository, Identifiable } from "./firestore/FirestoreRepository.js";
 
 export const persistAndDispatch = async<T extends Identifiable & DomainEventProducer> (
     repo: FirestoreRepository<T>, 

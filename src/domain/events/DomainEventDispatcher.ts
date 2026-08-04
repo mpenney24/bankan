@@ -3,6 +3,7 @@ import { DomainEvent } from "./DomainEvents.js";
 export type DomainEventHandler = (event: DomainEvent) => Promise<void> | void;
 
 export interface DomainEventDispatcher {
+    register(eventName: string, handler: DomainEventHandler): void, 
     dispatch(events: DomainEvent[]): Promise<void>;
 }
 

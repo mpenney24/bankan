@@ -6,6 +6,7 @@ export const ColumnSchema = z.object({
     id: z.uuid(),
     stateId: z.string(),
     displayName: z.string(),
+    // Mitch - remove these old references
     prevColumnId: z.string().nullable(),
     nextColumnId: z.string().nullable(),
     tickets: z.array(TicketSchema).readonly()

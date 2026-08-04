@@ -1,5 +1,5 @@
 import { FirestoreRepository } from '../../../infrastructure/persistence/firestore/FirestoreRepository.js';
-import { persistAndDispatch } from '../../../infrastructure/persistence/firestore/persistAndDispatch.js';
+import { persistAndDispatch } from '../../../infrastructure/persistence/persistAndDispatch.js';
 import { Result } from '../../common/Result.js';
 import { Board } from '../../entities/Board.js';
 import { DomainEventDispatcher } from '../../events/DomainEventDispatcher.js';

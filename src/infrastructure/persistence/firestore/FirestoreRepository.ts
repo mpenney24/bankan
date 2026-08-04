@@ -27,8 +27,8 @@ export class FirestoreRepository<T extends Identifiable> {
     constructor(
         private readonly db: Firestore, 
         collectionName: string,
-        entityClass: ClassConstructor<T>,
-        entitySchema: ZodType<any>
+        entityClass?: ClassConstructor<T>,
+        entitySchema?: ZodType<any>
     ) {
         this.documents = collection(this.db, collectionName).withConverter(
             createFirestoreConverter(entityClass, entitySchema)
@@ -40,6 +40,13 @@ export class FirestoreRepository<T extends Identifiable> {
         
         return onSnapshot(docRef, (snapshot) => {
             callback(snapshot.exists() ? snapshot.data() : null);
+        });
+    }
+
+    public subscribeAllChanges(callback: EntitySubscriptionCallback<T[]>) {
+        return onSnapshot(this.documents, (snapshot) => {
+            const entities = snapshot.docs.map(docSnap => docSnap.data());
+            callback(entities);
         });
     }
 
