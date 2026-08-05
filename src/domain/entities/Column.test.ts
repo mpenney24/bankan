@@ -10,7 +10,7 @@ describe('Column', () => {
 
     beforeEach(() => {
         column = h.createColumn(h.COLUMN_STATE_ID_BACKLOG);
-        ticket = h.createTicket(h.COLUMN_STATE_ID_BACKLOG);
+        ticket = h.createTicket(h.COLUMN_ID_BACKLOG);
     })
 
     describe('#addTicket', () => {

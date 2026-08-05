@@ -1,4 +1,4 @@
-import { Result } from "../../domain/common/Result.js";
+import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { FirestoreRepository, Identifiable } from "../persistence/firestore/FirestoreRepository.js";
 
 export interface IDomainSummary {
@@ -9,7 +9,7 @@ export interface IDomainSummary {
 export interface IDomainSummaryProjector {
     start(): void;
     stop(): void;
-    upsertSummary(summary: IDomainSummary): void;
+    upsertSummary(summary: IDomainSummary): Promise<void>;
 }
 
 export abstract class DomainSummaryProjector<T extends Identifiable> implements IDomainSummaryProjector {
@@ -37,8 +37,12 @@ export abstract class DomainSummaryProjector<T extends Identifiable> implements 
         }
     }
 
-    public async upsertSummary(summary: IDomainSummary): Promise<Result<void>> {
-        return this.summaryRepo.save(summary);
+    public async upsertSummary(summary: IDomainSummary): Promise<void> {
+        try {
+            this.summaryRepo.save(summary);
+        } catch(error) {
+            console.log(ERROR_CODES.F02, error);
+        }
     }
 
     protected abstract recalculateSummary(entity: T): Promise<void>;

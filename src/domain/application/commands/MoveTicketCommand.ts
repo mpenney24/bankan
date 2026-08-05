@@ -1,7 +1,9 @@
+import { BoardId, ColumnId, TicketId } from "../../common/Types.js";
+
 export class MoveTicketCommand {
     constructor(
-        public readonly boardId: string,
-        public readonly ticketId: string,
-        public readonly targetColumnId: string
+        public readonly boardId: BoardId,
+        public readonly ticketId: TicketId,
+        public readonly targetColumnId: ColumnId
     ) {}
 }

@@ -1,3 +1,5 @@
+import { BoardId, ColumnId, TicketId } from "../common/Types.js";
+
 export interface DomainEvent {
     readonly dateTimeOccurred: Date;
     getAggregateId(): string;
@@ -9,8 +11,8 @@ export interface DomainEventProducer {
 }
 
 export interface ITicketEventPayload {
-    boardId: string;
-    ticketId: string;
+    boardId: BoardId;
+    ticketId: TicketId;
 }
 
 export class TicketAddedEvent implements DomainEvent {
@@ -32,14 +34,14 @@ export class TicketMovedEvent implements DomainEvent {
 
     constructor(
         public readonly payload: ITicketEventPayload,
-        public readonly targetColumnId: string
+        public readonly targetColumnId: ColumnId
     ) {}
 
     public getAggregateId(): string {
         return this.payload.boardId;
     }
 
-    public static create(payload: ITicketEventPayload, targetColumnId: string) {
+    public static create(payload: ITicketEventPayload, targetColumnId: ColumnId) {
         return new TicketMovedEvent(payload, targetColumnId);
     }
 }

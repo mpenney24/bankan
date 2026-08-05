@@ -3,6 +3,7 @@ import { Board } from "../entities/Board.js";
 import { Column } from "../entities/Column.js";
 import { Ticket } from "../entities/Ticket.js";
 import { ICreateTicket } from "../entities/TicketSchema.js";
+import { ColumnId, ColumnIdSchema, createBoardId, createColumnId, State, StateSchema } from "../common/Types.js";
 
 export const mock = <T>(implementation: Partial<T>): T => {
     return implementation as T;
@@ -10,40 +11,34 @@ export const mock = <T>(implementation: Partial<T>): T => {
 
 // KEY LOGIC
 
-export const COLUMN_ID_BACKLOG: string = randomUUID();
-export const COLUMN_ID_IN_PROGRESS: string = randomUUID();
-export const COLUMN_ID_DONE: string = randomUUID();
+export const COLUMN_ID_BACKLOG: ColumnId = createColumnId();
+export const COLUMN_ID_IN_PROGRESS: ColumnId = createColumnId();
+export const COLUMN_ID_DONE: ColumnId = createColumnId();
 
-export const COLUMN_ID_INVALID: string = randomUUID();
+export const COLUMN_ID_INVALID: ColumnId = createColumnId();
 
-export const COLUMN_STATE_ID_BACKLOG: string = 'BACKLOG';
-export const COLUMN_STATE_ID_IN_PROGRESS: string = 'IN_PROGRESS';
-export const COLUMN_STATE_ID_DONE: string = 'DONE';
+export const COLUMN_STATE_ID_BACKLOG: State = StateSchema.parse('BACKLOG');
+export const COLUMN_STATE_ID_IN_PROGRESS: State = StateSchema.parse('IN_PROGRESS');
+export const COLUMN_STATE_ID_DONE: State = StateSchema.parse('DONE');
 
-export const COLUMN_STATE_ID_INVALID: string = 'INVALID';
+export const COLUMN_STATE_ID_INVALID: State = StateSchema.parse('INVALID');
 
 // SCHEMA LOGIC
 
-export type ColumnSchemaDefinition = Pick<Column, 'id' | 'displayName' | 'prevColumnId' | 'nextColumnId'>;
+export type ColumnSchemaDefinition = Pick<Column, 'id' | 'displayName'>;
 
 export const TEST_BOARD_COLUMN_SCHEMA: Record<string, ColumnSchemaDefinition> = {
    [COLUMN_STATE_ID_BACKLOG]: {
-       id: COLUMN_ID_BACKLOG,
-       displayName: 'Backlog', 
-       prevColumnId: null, 
-       nextColumnId: COLUMN_ID_IN_PROGRESS
+       id: ColumnIdSchema.parse(COLUMN_ID_BACKLOG),
+       displayName: 'Backlog'
    },
    [COLUMN_STATE_ID_IN_PROGRESS]: {
-       id: COLUMN_ID_IN_PROGRESS,
-       displayName: 'In Progress', 
-       prevColumnId: COLUMN_ID_BACKLOG, 
-       nextColumnId: COLUMN_ID_DONE 
+       id: ColumnIdSchema.parse(COLUMN_ID_IN_PROGRESS),
+       displayName: 'In Progress'
    },
    [COLUMN_STATE_ID_DONE]: {
-       id: COLUMN_ID_DONE, 
-       displayName: 'Done', 
-       prevColumnId: COLUMN_ID_IN_PROGRESS, 
-       nextColumnId: null 
+       id: ColumnIdSchema.parse(COLUMN_ID_DONE), 
+       displayName: 'Done'
    }
 };
 export const TEST_BOARD_COLUMN_SCHEMA_KEYS = Object.keys(TEST_BOARD_COLUMN_SCHEMA);
@@ -53,10 +48,10 @@ export const TEST_BOARD_COLUMN_SCHEMA_KEYS = Object.keys(TEST_BOARD_COLUMN_SCHEM
 export const VERSION = 0;
 
 export const createBoard = (): Board => {
-    const board = new Board(randomUUID(), VERSION);
+    const board = new Board(createBoardId(), VERSION);
     
     TEST_BOARD_COLUMN_SCHEMA_KEYS.forEach(stateId => {
-        const col = createColumn(stateId);
+        const col = createColumn(StateSchema.parse(stateId));
         col._addTicket(createTicket(col.id));
         board._addColumn(col);
     });
@@ -65,22 +60,22 @@ export const createBoard = (): Board => {
 }
 
 export const createColumn = (
-    stateId: string = COLUMN_STATE_ID_BACKLOG
+    stateId: State = COLUMN_STATE_ID_BACKLOG
 ): Column => {
 
     if (stateId === COLUMN_STATE_ID_INVALID) {
-        return new Column(COLUMN_ID_INVALID, COLUMN_STATE_ID_INVALID, 'Invalid Column', null, null);
+        return new Column(COLUMN_ID_INVALID, COLUMN_STATE_ID_INVALID, 'Invalid Column');
     }
 
-    const { id, displayName, prevColumnId, nextColumnId } = TEST_BOARD_COLUMN_SCHEMA[stateId]!;
+    const { id, displayName } = TEST_BOARD_COLUMN_SCHEMA[stateId]!;
 
-    return new Column(id, stateId, displayName, prevColumnId, nextColumnId);
+    return new Column(id, stateId, displayName);
 };
 
-export const createTicket = (columnId: string) => {
+export const createTicket = (columnId: ColumnId) => {
     return Ticket.create(createTicketPayload(columnId));
 }
 
-export const createTicketPayload = (columnId: string): ICreateTicket => {
+export const createTicketPayload = (columnId: ColumnId): ICreateTicket => {
     return { name: 'Test Ticket', columnId, description: 'A test ticket', priority: 'HIGH' }
 }

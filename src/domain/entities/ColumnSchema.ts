@@ -1,14 +1,12 @@
 import { z } from 'zod';
 import { TicketSchema } from './TicketSchema.js';
 import { Ticket } from './Ticket.js';
+import { ColumnIdSchema, StateSchema, TicketId } from '../common/Types.js';
 
 export const ColumnSchema = z.object({
-    id: z.uuid(),
-    stateId: z.string(),
+    id: ColumnIdSchema,
+    stateId: StateSchema,
     displayName: z.string(),
-    // Mitch - remove these old references
-    prevColumnId: z.string().nullable(),
-    nextColumnId: z.string().nullable(),
     tickets: z.array(TicketSchema).readonly()
 });
 
@@ -17,5 +15,5 @@ export type IColumnReadOnly = Readonly<IColumn>;
 
 export interface IColumnInternal extends IColumnReadOnly {
     _addTicket(ticket: Ticket): void;
-    _removeTicket(ticketId: string): void;
+    _removeTicket(ticketId: TicketId): void;
 }

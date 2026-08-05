@@ -5,8 +5,9 @@ import { ICreateTicket, IMoveTicket } from '../../domain/entities/TicketSchema.j
 import { useServices } from '../services/ServiceContext.js';
 import { Result } from '../../domain/common/Result.js';
 import { IBoardExternal } from '../../domain/entities/BoardSchema.js';
+import { BoardId } from '../../domain/common/Types.js';
 
-export function useBoard(boardId: string) {
+export function useBoard(boardId: BoardId) {
     const { boardServiceFacade } = useServices();
     const [board, setBoard] = useState<IBoardExternal | null>(null);
     const [loading, setLoading] = useState(true);

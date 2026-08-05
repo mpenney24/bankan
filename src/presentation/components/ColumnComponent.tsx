@@ -3,12 +3,13 @@ import { Ticket } from '../../domain/entities/Ticket.js';
 import { TicketComponent } from './TicketComponent.js';
 import { Result } from '../../domain/common/Result.js';
 import { ERROR_CODES } from '../../errors/ErrorCodes.js';
+import { ColumnId, TicketId, TicketIdSchema } from '../../domain/common/Types.js';
 
 interface Props {
-    columnId: string;
+    columnId: ColumnId;
     title: string;
     tickets: Result<ReadonlyArray<Ticket>>;
-    onTicketDrop: (ticketId: string, targetColumnId: string) => void;
+    onTicketDrop: (ticketId: TicketId, targetColumnId: ColumnId) => void;
 }
 
 export const ColumnComponent: React.FC<Props> = React.memo(({ columnId, title, tickets, onTicketDrop }) => {
@@ -34,7 +35,7 @@ export const ColumnComponent: React.FC<Props> = React.memo(({ columnId, title, t
         
         const ticketId = e.dataTransfer.getData('text/plain');
         if (ticketId) {
-            onTicketDrop(ticketId, columnId);
+            onTicketDrop(TicketIdSchema.parse(ticketId), columnId);
         }
     };
 

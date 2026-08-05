@@ -3,6 +3,7 @@ import { ColumnComponent } from '../components/ColumnComponent.js';
 import { styled } from 'styled-components';
 import { useBoard } from '../hooks/useBoard.js';
 import { AddTicketForm } from '../forms/AddTicketForm.js';
+import { BoardId } from '../../domain/common/Types.js';
 
 const ColumnsWrapper = styled.div`
     display: flex;
@@ -20,7 +21,7 @@ const ColumnsWrapper = styled.div`
     }
 `;
 
-const BOARD_ID: string = import.meta.env.VITE_FIREBASE_BOARD_ID;
+const BOARD_ID: BoardId = import.meta.env.VITE_FIREBASE_BOARD_ID;
 
 export const BoardView: React.FC = () => {
     const { board, loading, error, handleTicketDrop, handleAddTicket } = useBoard(BOARD_ID);

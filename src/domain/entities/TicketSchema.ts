@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import { ColumnId, ColumnIdSchema, ISODateStringSchema, TicketIdSchema } from '../common/Types.js';
 
 export const CreateTicketSchema = z.object({
     name: z.string().min(1, "Name is required"),
     // Mitch - put this back once default is selected!
-    columnId: z.string().default('b5624472-edaf-4b76-8289-d89417f97dfd'), //min(1, "Column ID is required"),
+    columnId: ColumnIdSchema.default(ColumnIdSchema.parse('b5624472-edaf-4b76-8289-d89417f97dfd')), //min(1, "Column ID is required"),
     description: z.string().min(1, "Description is required"),
     priority: z.string().min(1, "Priority is required")
 });
@@ -11,22 +12,22 @@ export const CreateTicketSchema = z.object({
 export type ICreateTicket = z.infer<typeof CreateTicketSchema>;
 
 export const MoveTicketSchema = z.object({
-    ticketId: z.uuid(),
-    targetColumnId: z.uuid()
+    ticketId: TicketIdSchema,
+    targetColumnId: ColumnIdSchema
 });
 
 export type IMoveTicket = z.infer<typeof MoveTicketSchema>;
 
 export const TicketSchema = CreateTicketSchema.extend({
-    id: z.uuid(),
-    created: z.iso.datetime(),
-    updated: z.iso.datetime().nullable(),
+    id: TicketIdSchema,
+    created: ISODateStringSchema,
+    updated: ISODateStringSchema.nullable(),
 });
 
 export type ITicket = z.infer<typeof TicketSchema>;
 export type ITicketReadOnly = Readonly<ITicket>;
 
 export interface ITicketInternal extends ITicketReadOnly {
-    _transitionTo(newColumnId: string): void;
+    _transitionTo(newColumnId: ColumnId): void;
 }
 

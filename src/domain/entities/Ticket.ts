@@ -1,16 +1,20 @@
 import { Expose } from "class-transformer";
 import { ITicket, ITicketInternal } from "./TicketSchema.js";
 
+import { createCurrentISODate, createTicketId, 
+    type ColumnId, type ISODateString, type TicketId 
+} from "../common/Types.js";
+
 // DDD - Entity
 export class Ticket implements ITicketInternal {
 
-    private _id: string;
-    private _columnId: string;
+    private _id: TicketId;
+    private _columnId: ColumnId;
     private _name: string;
     private _description: string;
     private _priority: string;
-    private _created: string;
-    private _updated: string | null;
+    private _created: ISODateString;
+    private _updated: ISODateString | null;
 
     private constructor(payload: ITicket) {
         this._id = payload?.id;
@@ -22,11 +26,11 @@ export class Ticket implements ITicketInternal {
         this._updated = payload?.updated;
     }
 
-    @Expose() get id(): string { return this._id; }
-    private set id(id: string) { this._id = id; }
+    @Expose() get id(): TicketId { return this._id; }
+    private set id(id: TicketId) { this._id = id; }
 
-    @Expose() get columnId(): string { return this._columnId; }
-    set columnId(columnId: string) { this._columnId = columnId; }
+    @Expose() get columnId(): ColumnId { return this._columnId; }
+    set columnId(columnId: ColumnId) { this._columnId = columnId; }
 
     @Expose() get name(): string { return this._name; }
     set name(name: string) { this._name = name; }
@@ -37,21 +41,21 @@ export class Ticket implements ITicketInternal {
     @Expose() get priority(): string { return this._priority; }
     set priority(priority: string) { this._priority = priority; }
 
-    @Expose() get created(): string { return this._created; }
-    private set created(created: string) { this._created = created; }
+    @Expose() get created(): ISODateString { return this._created; }
+    private set created(created: ISODateString) { this._created = created; }
 
-    @Expose() get updated(): string | null { return this._updated; }
-    set updated(updated: string) { this._updated = updated; }
+    @Expose() get updated(): ISODateString | null { return this._updated; }
+    set updated(updated: ISODateString) { this._updated = updated; }
 
-    public _transitionTo(newColumnId: string): void {
+    public _transitionTo(newColumnId: ColumnId): void {
         this._columnId = newColumnId;
-        this._updated = new Date().toISOString();
+        this._updated = createCurrentISODate();
     }
 
     static create(payload: Omit<ITicket, 'id' | 'created' | 'updated'>): Ticket {
         return new Ticket({
-            id: crypto.randomUUID(),
-            created: new Date().toISOString(),
+            id: createTicketId(),
+            created: createCurrentISODate(),
             updated: null,
             ...payload
         });

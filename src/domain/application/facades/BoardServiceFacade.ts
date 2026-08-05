@@ -1,4 +1,5 @@
 import { EntitySubscriptionCallback, FirestoreRepository } from "../../../infrastructure/persistence/firestore/FirestoreRepository.js";
+import { BoardId } from "../../common/Types.js";
 import { Board } from "../../entities/Board.js";
 import { IBoardExternal } from "../../entities/BoardSchema.js";
 import { AddTicketCommand } from "../commands/AddTicketCommand.js";
@@ -18,11 +19,11 @@ export class BoardServiceFacade {
         private readonly addTicketHandler: AddTicketHandler
     ) {}
 
-    public subscribeToBoard(boardId: string, onUpdate: BoardSubscriptionCallback) {
+    public subscribeToBoard(boardId: BoardId, onUpdate: BoardSubscriptionCallback) {
         return this.boardRepo.subscribe(boardId, onUpdate);
     }
 
-    async getBoard(boardId: string) {
+    async getBoard(boardId: BoardId) {
         return this.getBoardHandler.execute(new GetBoardQuery(boardId));
     }
 

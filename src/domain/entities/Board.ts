@@ -7,6 +7,8 @@ import { TicketAddedEvent, TicketMovedEvent } from "../events/DomainEvents.js";
 import { DomainEventAggregateRoot } from "../events/DomainEventAggregateRoot.js";
 import { Result } from "../common/Result.js";
 
+import type { BoardId, ColumnId, TicketId } from "../common/Types.js";
+
 // DDD - Aggregate root
 @Exclude()
 export class Board extends DomainEventAggregateRoot implements IBoardInternal {
@@ -16,14 +18,14 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
     private _columns: Column[] = [];
 
     constructor(
-        private _id: string,
+        private _id: BoardId,
         private _version: number
     ) {
         super();
     }
 
-    @Expose() get id(): string { return this._id; }
-    private set id(id: string) { this._id = id; }
+    @Expose() get id(): BoardId { return this._id; }
+    private set id(id: BoardId) { this._id = id; }
 
     @Expose() get columns(): ReadonlyArray<Column> { return this._columns; }
     private set columns(columns: Column[]) { this._columns = columns }
@@ -31,7 +33,7 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
     @Expose() get version(): number { return this._version; }
     private set version(version: number) { this._version = version }
 
-    public getTickets(targetColumnId: string): Result<ReadonlyArray<Ticket>> {
+    public getTickets(targetColumnId: ColumnId): Result<ReadonlyArray<Ticket>> {
         const column = this._getColumn(targetColumnId);
         if(!column) {
             return Result.fail(ERROR_CODES.B00(targetColumnId));
@@ -52,7 +54,7 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
         return Result.ok();
     }
 
-    public moveTicket(ticketId: string, targetColumnId: string): Result<void> {
+    public moveTicket(ticketId: TicketId, targetColumnId: ColumnId): Result<void> {
         const ticket = this._getTicket(ticketId);
         if(!ticket) {
             return Result.fail(ERROR_CODES.B01(ticketId));
@@ -84,7 +86,7 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
         }
     }
 
-    private _getTicket(ticketId: string): Ticket | undefined {
+    private _getTicket(ticketId: TicketId): Ticket | undefined {
         for(const column of this._columns) {
             const ticket = column.tickets.find(t => t.id === ticketId);
             if (ticket) {
@@ -93,7 +95,7 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
         }
     }
 
-    private _getColumn(columnId: string): Column | undefined {
+    private _getColumn(columnId: ColumnId): Column | undefined {
         return this._columns.find(col => col.id === columnId);
     }
 
