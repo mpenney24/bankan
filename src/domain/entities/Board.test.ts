@@ -6,6 +6,9 @@ import { Ticket } from "./Ticket.js";
 import { Column } from "./Column.js";
 import { DomainEvent, TicketAddedEvent, TicketMovedEvent } from "../events/DomainEvents.js";
 import { ClassConstructor } from "class-transformer";
+import { ColumnByIdSpec } from "../common/specifications/ColumnSpecs.js";
+import { TicketByIdSpec } from "../common/specifications/TicketSpecs.js";
+import { createTicketId } from "../common/Types.js";
 
 function validateBoardEvent<T extends DomainEvent>(board: Board, expectedEvent: T) {
     const events = board.getDomainEvents();
@@ -31,7 +34,7 @@ describe('Board', () => {
 
         board = h.createBoard();
         column = board.columns.find(col => col.id === h.COLUMN_ID_BACKLOG)!;
-        ticket = board.getTickets(column.id).value[0]!;
+        ticket = board.getTickets().value[0]!;
     });
 
     afterEach(() => {
@@ -45,16 +48,29 @@ describe('Board', () => {
     describe('#getTickets', () => {
 
         it('should successfully return the stored tickets for the target column', () => {
-            const result = board.getTickets(column.id);
+            const result = board.getTickets({ columnSpec: new ColumnByIdSpec(column.id) });
             expect(result.isSuccess).toBe(true);
             expect(result.value).toStrictEqual([ticket]);
         });
 
-        it('should fail to return stored tickets if the target column cannot be found', () => {
-            const result = board.getTickets(h.COLUMN_ID_INVALID);
-            expect(result.isFailure).toBe(true);
-            expect(result.error).toBe(ERROR_CODES.B00(h.COLUMN_ID_INVALID));
+        it('should successfully return the filtered stored tickets for the target column', () => {
+            const result = board.getTickets({ columnSpec: new ColumnByIdSpec(column.id), ticketSpec: new TicketByIdSpec(ticket.id) });
+            expect(result.isSuccess).toBe(true);
+            expect(result.value).toStrictEqual([ticket]);
         });
+
+        it('should successfully return no stored tickets for the filtered target column if there are none found by the ticket filter', () => {
+            const result = board.getTickets({ columnSpec: new ColumnByIdSpec(column.id), ticketSpec: new TicketByIdSpec(createTicketId()) });
+            expect(result.isSuccess).toBe(true);
+            expect(result.value).toStrictEqual([]);
+        });
+
+        it('should successfully return no stored tickets if the filtered target column cannot be found', () => {
+            const result = board.getTickets({ columnSpec: new ColumnByIdSpec(h.COLUMN_ID_INVALID) });
+            expect(result.isSuccess).toBe(true);
+            expect(result.value).toStrictEqual([]);
+        });
+
     });
 
     describe('#addTicket', () => {

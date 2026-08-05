@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { Board } from "../entities/Board.js";
 import { Column } from "../entities/Column.js";
 import { Ticket } from "../entities/Ticket.js";

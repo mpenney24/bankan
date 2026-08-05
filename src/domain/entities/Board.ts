@@ -1,5 +1,4 @@
 import { Column } from "./Column.js";
-import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { Ticket } from "./Ticket.js";
 import { Exclude, Expose, Type } from "class-transformer";
 import { IBoardInternal } from "./BoardSchema.js";
@@ -8,6 +7,8 @@ import { DomainEventAggregateRoot } from "../events/DomainEventAggregateRoot.js"
 import { Result } from "../common/Result.js";
 
 import type { BoardId, ColumnId, TicketId } from "../common/Types.js";
+import { ERROR_CODES } from "../../errors/ErrorCodes.js";
+import { ISpecification } from "../common/Specification.js";
 
 // DDD - Aggregate root
 @Exclude()
@@ -33,17 +34,29 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
     @Expose() get version(): number { return this._version; }
     private set version(version: number) { this._version = version }
 
-    public getTickets(targetColumnId: ColumnId): Result<ReadonlyArray<Ticket>> {
-        const column = this._getColumn(targetColumnId);
-        if(!column) {
-            return Result.fail(ERROR_CODES.B00(targetColumnId));
-        }
-        return Result.ok(column.tickets);
+    public getTickets(specs?: { 
+        columnSpec?: ISpecification<Column>; 
+        ticketSpec?: ISpecification<Ticket> 
+    }): Result<ReadonlyArray<Ticket>> {
+        const { columnSpec, ticketSpec } = specs ?? {};
+
+        const matchingColumns = 
+            columnSpec 
+            ? this._columns.filter(col => columnSpec.isSatisfiedBy(col))
+            : this._columns;
+
+        const matchingTickets = matchingColumns.flatMap(col => 
+            ticketSpec 
+            ? col.tickets.filter(ticket => ticketSpec.isSatisfiedBy(ticket))
+            : col.tickets
+        );
+
+        return Result.ok(matchingTickets);
     }
 
     public addTicket(ticket: Ticket): Result<void> {
         const column = this._getColumn(ticket.columnId);
-        if(!column) {
+        if (!column) {
             return Result.fail(ERROR_CODES.UIT01);
         }
 
@@ -59,7 +72,7 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
         if(!ticket) {
             return Result.fail(ERROR_CODES.B01(ticketId));
         }
-        
+
         const sourceCol = this._getColumn(ticket.columnId);
         if(!sourceCol) {
             return Result.fail(ERROR_CODES.B00(ticket.columnId));
@@ -72,23 +85,23 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
 
         ticket._transitionTo(targetColumnId);
 
-        sourceCol._removeTicket(ticket.id);
         targetCol._addTicket(ticket);
+        sourceCol._removeTicket(ticket.id);
 
-        this.addDomainEvent(new TicketMovedEvent({ boardId: this.id, ticketId: ticketId }, targetColumnId));
+        this.addDomainEvent(new TicketMovedEvent({ boardId: this.id, ticketId }, targetColumnId));
 
         return Result.ok();
     }
 
     public _addColumn(column: Column): void {
-        if (!this._columns.some(c => c.id === column.id)) {
+        if (!this._columns.some(col => col.id === column.id)) {
             this._columns.push(column);
         }
     }
 
     private _getTicket(ticketId: TicketId): Ticket | undefined {
         for(const column of this._columns) {
-            const ticket = column.tickets.find(t => t.id === ticketId);
+            const ticket = column.tickets.find(tick => tick.id === ticketId);
             if (ticket) {
                 return ticket;
             }

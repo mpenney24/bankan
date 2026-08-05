@@ -8,7 +8,7 @@ export const ERROR_CODES = {
     F01: (documentId: string) => `Invalid document id: id ${documentId} could not be found`,
     F02: 'Failed to save document:',
     UIB01: 'Failed to update board, rolling back:',
+    UIB02: 'Failed to move ticket to column, rolling back:',
     UIT01: 'Failed to add ticket, rolling back:',
-    UIT02: 'Failed to load tickets. Please refresh the page and try again.',
-    ZUIB01: 'Invalid drag-and-drop payload:',
+    UIT02: 'Failed to load tickets. Please refresh the page and try again.'
 } as const;
