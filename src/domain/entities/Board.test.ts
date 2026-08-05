@@ -95,7 +95,7 @@ describe('Board', () => {
             const result = board.addTicket(newTicket);
             expect(result.isFailure).toBe(true);
 
-            expect(result.error).toBe(ERROR_CODES.UIT01); 
+            expect(result.error).toBe(ERROR_CODES.B00(h.COLUMN_ID_INVALID)); 
         });
 
     });

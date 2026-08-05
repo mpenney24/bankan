@@ -32,4 +32,25 @@ export class Result<T, E = string> {
         }
         return this._error as E;
     }
+
+    public static combine(results: Result<any>[]): Result<void> {
+        for (const result of results) {
+            if (result.isFailure) return Result.fail(result.error);
+        }
+        return Result.ok();
+    }
+
+    public map<U>(fn: (value: T) => U): Result<U, E> {
+        if (this.isFailure) {
+            return Result.fail(this.error);
+        }
+        return Result.ok(fn(this.value));
+    }
+
+    public bind<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
+        if (this.isFailure) {
+            return Result.fail(this.error);
+        }
+        return fn(this.value);
+    }
 }

@@ -5,11 +5,11 @@ import { IBoardInternal } from "./BoardSchema.js";
 import { TicketAddedEvent, TicketMovedEvent } from "../events/DomainEvents.js";
 import { DomainEventAggregateRoot } from "../events/DomainEventAggregateRoot.js";
 import { Result } from "../common/Result.js";
-
-import type { BoardId, ColumnId, TicketId } from "../common/Types.js";
 import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { ISpecification } from "../common/Specification.js";
 import { TicketCanBeAddedSpec, TicketCanBeMovedSpec } from "../common/specifications/TicketSpecs.js";
+
+import type { BoardId, ColumnId, TicketId } from "../common/Types.js";
 
 // DDD - Aggregate root
 @Exclude()
@@ -56,45 +56,36 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
     }
 
     public addTicket(ticket: Ticket): Result<void> {
-        const column = this._getColumn(ticket.columnId);
-        if (!column) {
-            return Result.fail(ERROR_CODES.UIT01);
-        }
+        return this._getColumn(ticket.columnId)
+            .bind(column => {
 
-        const ticketAddSpec = new TicketCanBeAddedSpec(ticket);
-        const result = column._addTicket(ticketAddSpec);
-        if(result.isFailure) {
-            return result;
-        }
-
-        this.addDomainEvent(new TicketAddedEvent({ boardId: this.id, ticketId: ticket.id }));
-
-        return Result.ok();
+                const ticketAddSpec = new TicketCanBeAddedSpec(ticket);
+                return column._addTicket(ticketAddSpec)
+                    .map(() => {
+                        this.addDomainEvent(new TicketAddedEvent({ boardId: this.id, ticketId: ticket.id }));
+                    });
+            });
     }
 
     public moveTicket(ticketId: TicketId, targetColumnId: ColumnId): Result<void> {
-        const ticket = this._getTicket(ticketId);
-        if (!ticket) return Result.fail(ERROR_CODES.B01(ticketId));
+        return this._getTicket(ticketId)
+            .bind(ticket => 
+                this._getSourceAndTargetColumns(ticket.columnId, targetColumnId)
+                    .bind(([sourceCol, targetCol]) => {
+                        
+                        const moveSpec = new TicketCanBeMovedSpec(targetCol.id);
+                        if (!moveSpec.isSatisfiedBy(ticket)) {
+                            return Result.fail<void>(moveSpec.errorMessage);
+                        }
 
-        const sourceCol = this._getColumn(ticket.columnId);
-        if (!sourceCol) return Result.fail(ERROR_CODES.B00(ticket.columnId));
-
-        const targetCol = this._getColumn(targetColumnId);
-        if (!targetCol) return Result.fail(ERROR_CODES.B00(targetColumnId));
-
-        const moveSpec = new TicketCanBeMovedSpec(targetCol.id);
-        if (!moveSpec.isSatisfiedBy(ticket)) {
-            return Result.fail(moveSpec.errorMessage);
-        }
-
-        const addResult = targetCol._addTicket(new TicketCanBeAddedSpec(ticket));
-        if (addResult.isFailure) return addResult;
-
-        sourceCol._removeTicket(ticket.id);
-        ticket._transitionTo(targetColumnId);
-
-        this.addDomainEvent(new TicketMovedEvent({ boardId: this.id, ticketId }, targetColumnId));
-        return Result.ok();
+                        return targetCol._addTicket(new TicketCanBeAddedSpec(ticket))
+                            .map(() => {
+                                sourceCol._removeTicket(ticket.id);
+                                ticket._transitionTo(targetColumnId);
+                                this.addDomainEvent(new TicketMovedEvent({ boardId: this.id, ticketId }, targetColumnId));
+                            });
+                    })
+            );
     }
 
     public _addColumn(column: Column): void {
@@ -103,17 +94,29 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
         }
     }
 
-    private _getTicket(ticketId: TicketId): Ticket | undefined {
-        for(const column of this._columns) {
-            const ticket = column.tickets.find(tick => tick.id === ticketId);
-            if (ticket) {
-                return ticket;
-            }
-        }
+    private _getTicket(ticketId: TicketId): Result<Ticket> {
+        const ticket = this._columns
+            .flatMap(col => col.tickets)
+            .find(t => t.id === ticketId);
+
+        return ticket ? Result.ok(ticket) : Result.fail(ERROR_CODES.B01(ticketId));
     }
 
-    private _getColumn(columnId: ColumnId): Column | undefined {
-        return this._columns.find(col => col.id === columnId);
+    private _getColumn(columnId: ColumnId): Result<Column> {
+        const column = this._columns.find(col => col.id === columnId);
+        return column ? Result.ok(column) : Result.fail(ERROR_CODES.B00(columnId));
+    }
+
+    private _getSourceAndTargetColumns(sourceId: ColumnId, targetId: ColumnId): Result<[Column, Column]> {
+        const source = this._getColumn(sourceId);
+        const target = this._getColumn(targetId);
+
+        const combined = Result.combine([source, target]);
+        if (combined.isFailure) {
+            return Result.fail(combined.error);
+        }
+
+        return Result.ok([source.value, target.value]);
     }
 
 }
