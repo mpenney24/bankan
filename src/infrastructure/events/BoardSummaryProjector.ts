@@ -1,5 +1,5 @@
-import { DomainSummaryProjector, IDomainSummary } from "../../infrastructure/events/DomainSummaryProjector.js";
-import { Board } from "../entities/Board.js";
+import { DomainSummaryProjector, IDomainSummary } from "./DomainSummaryProjector.js";
+import { Board } from "../../domain/entities/Board.js";
 
 export interface BoardSummaryReadModel extends IDomainSummary {
     readonly columnCount: number;

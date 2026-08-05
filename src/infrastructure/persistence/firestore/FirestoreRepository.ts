@@ -43,13 +43,6 @@ export class FirestoreRepository<T extends Identifiable> {
         });
     }
 
-    public subscribeAllChanges(callback: EntitySubscriptionCallback<T[]>) {
-        return onSnapshot(this.documents, (snapshot) => {
-            const entities = snapshot.docs.map(docSnap => docSnap.data());
-            callback(entities);
-        });
-    }
-
     public async save(entity: T): Promise<Result<void>> {
         const docRef = doc(this.documents, entity.id);
 
