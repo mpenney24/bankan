@@ -3,6 +3,7 @@ import { Column } from "../entities/Column.js";
 import { Ticket } from "../entities/Ticket.js";
 import { ICreateTicket } from "../entities/TicketSchema.js";
 import { ColumnId, ColumnIdSchema, createBoardId, createColumnId, State, StateSchema } from "../common/Types.js";
+import { TicketCanBeAddedSpec } from "../common/specifications/TicketSpecs.js";
 
 export const mock = <T>(implementation: Partial<T>): T => {
     return implementation as T;
@@ -51,9 +52,19 @@ export const createBoard = (): Board => {
     
     TEST_BOARD_COLUMN_SCHEMA_KEYS.forEach(stateId => {
         const col = createColumn(StateSchema.parse(stateId));
-        col._addTicket(createTicket(col.id));
+        col._addTicket(new TicketCanBeAddedSpec(createTicket(col.id)));
         board._addColumn(col);
     });
+
+    if(board.columns.length !== TEST_BOARD_COLUMN_SCHEMA_KEYS.length) {
+        throw new Error(`COLUMNS not equal, board=${board.columns.length}, expected=${TEST_BOARD_COLUMN_SCHEMA_KEYS.length}`);
+    }
+
+    const ticketCount = board.columns.flatMap(col => col.tickets).length;
+
+    if(ticketCount !== TEST_BOARD_COLUMN_SCHEMA_KEYS.length) {
+        throw new Error(`TICKETS not equal, board=${ticketCount}, expected=${TEST_BOARD_COLUMN_SCHEMA_KEYS.length}`);
+    }
     
     return board;
 }

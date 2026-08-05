@@ -28,7 +28,6 @@ export class TicketCanBeMovedSpec extends CompositeSpecification<Ticket> {
     }
 }
 
-// Mitch - how to incorporate? (ANY OF THESE?)
 export class TicketCanBeAddedSpec extends CompositeSpecification<Ticket> {
     public readonly errorMessage: string = ERROR_CODES.UIT01;
 

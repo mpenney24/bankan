@@ -41,10 +41,6 @@ describe('Board', () => {
         vi.useRealTimers();
     });
 
-    it('should successfully instantiate the board', () => {
-        expect(board.columns.length).toBe(h.TEST_BOARD_COLUMN_SCHEMA_KEYS.length);
-    });
-
     describe('#getTickets', () => {
 
         it('should successfully return the stored tickets for the target column', () => {

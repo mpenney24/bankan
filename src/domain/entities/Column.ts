@@ -1,6 +1,8 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { Ticket } from "./Ticket.js";
 import { IColumnInternal } from "./ColumnSchema.js";
+import { TicketCanBeAddedSpec } from "../common/specifications/TicketSpecs.js";
+import { Result } from "../common/Result.js";
 
 import type { ColumnId, State, TicketId } from "../common/Types.js";
 
@@ -30,10 +32,13 @@ export class Column implements IColumnInternal {
     @Expose() get tickets(): ReadonlyArray<Ticket> { return this._tickets; }
     private set tickets(tickets: Ticket[]) { this._tickets = tickets; }
 
-    public _addTicket(ticket: Ticket): void {
-        if (!this._tickets.find(t => t.id === ticket.id)) {
-            this._tickets.push(ticket);
+    public _addTicket(spec: TicketCanBeAddedSpec): Result<void> {
+        if (this._tickets.some(tick => !spec.isSatisfiedBy(tick))) {
+            return Result.fail(spec.errorMessage);
         }
+        this._tickets.push(spec.ticketToAdd);
+
+        return Result.ok();
     }
 
     public _removeTicket(ticketId: TicketId): void {

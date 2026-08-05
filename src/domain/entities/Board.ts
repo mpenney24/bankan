@@ -9,6 +9,7 @@ import { Result } from "../common/Result.js";
 import type { BoardId, ColumnId, TicketId } from "../common/Types.js";
 import { ERROR_CODES } from "../../errors/ErrorCodes.js";
 import { ISpecification } from "../common/Specification.js";
+import { TicketCanBeAddedSpec, TicketCanBeMovedSpec } from "../common/specifications/TicketSpecs.js";
 
 // DDD - Aggregate root
 @Exclude()
@@ -60,7 +61,11 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
             return Result.fail(ERROR_CODES.UIT01);
         }
 
-        column._addTicket(ticket);
+        const ticketAddSpec = new TicketCanBeAddedSpec(ticket);
+        const result = column._addTicket(ticketAddSpec);
+        if(result.isFailure) {
+            return result;
+        }
 
         this.addDomainEvent(new TicketAddedEvent({ boardId: this.id, ticketId: ticket.id }));
 
@@ -69,27 +74,26 @@ export class Board extends DomainEventAggregateRoot implements IBoardInternal {
 
     public moveTicket(ticketId: TicketId, targetColumnId: ColumnId): Result<void> {
         const ticket = this._getTicket(ticketId);
-        if(!ticket) {
-            return Result.fail(ERROR_CODES.B01(ticketId));
-        }
+        if (!ticket) return Result.fail(ERROR_CODES.B01(ticketId));
 
         const sourceCol = this._getColumn(ticket.columnId);
-        if(!sourceCol) {
-            return Result.fail(ERROR_CODES.B00(ticket.columnId));
-        }
+        if (!sourceCol) return Result.fail(ERROR_CODES.B00(ticket.columnId));
 
         const targetCol = this._getColumn(targetColumnId);
-        if(!targetCol) {
-            return Result.fail(ERROR_CODES.B00(targetColumnId));
+        if (!targetCol) return Result.fail(ERROR_CODES.B00(targetColumnId));
+
+        const moveSpec = new TicketCanBeMovedSpec(targetCol.id);
+        if (!moveSpec.isSatisfiedBy(ticket)) {
+            return Result.fail(moveSpec.errorMessage);
         }
 
+        const addResult = targetCol._addTicket(new TicketCanBeAddedSpec(ticket));
+        if (addResult.isFailure) return addResult;
+
+        sourceCol._removeTicket(ticket.id);
         ticket._transitionTo(targetColumnId);
 
-        targetCol._addTicket(ticket);
-        sourceCol._removeTicket(ticket.id);
-
         this.addDomainEvent(new TicketMovedEvent({ boardId: this.id, ticketId }, targetColumnId));
-
         return Result.ok();
     }
 
