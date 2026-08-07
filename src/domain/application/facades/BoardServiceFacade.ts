@@ -1,13 +1,16 @@
-import { EntitySubscriptionCallback, FirestoreRepository } from "../../../infrastructure/persistence/firestore/FirestoreRepository.js";
-import { BoardId } from "../../common/Types.js";
-import { Board } from "../../entities/Board.js";
-import { IBoardExternal } from "../../entities/BoardSchema.js";
-import { AddTicketCommand } from "../commands/AddTicketCommand.js";
-import { AddTicketHandler } from "../commands/AddTicketHandler.js";
-import { MoveTicketCommand } from "../commands/MoveTicketCommand.js";
-import { MoveTicketHandler } from "../commands/MoveTicketHandler.js";
-import { GetBoardHandler } from "../queries/GetBoardHandler.js";
-import { GetBoardQuery } from "../queries/GetBoardQuery.js";
+import {
+    EntitySubscriptionCallback,
+    FirestoreRepository,
+} from '../../../infrastructure/persistence/firestore/FirestoreRepository.js';
+import { BoardId } from '../../common/Types.js';
+import { Board } from '../../entities/Board.js';
+import { IBoardExternal } from '../../entities/BoardSchema.js';
+import { AddTicketCommand } from '../commands/AddTicketCommand.js';
+import { AddTicketHandler } from '../commands/AddTicketHandler.js';
+import { MoveTicketCommand } from '../commands/MoveTicketCommand.js';
+import { MoveTicketHandler } from '../commands/MoveTicketHandler.js';
+import { GetBoardHandler } from '../queries/GetBoardHandler.js';
+import { GetBoardQuery } from '../queries/GetBoardQuery.js';
 
 type BoardSubscriptionCallback = EntitySubscriptionCallback<IBoardExternal>;
 
@@ -23,8 +26,8 @@ export class BoardServiceFacade {
         return this.boardRepo.subscribe(boardId, onUpdate);
     }
 
-    async getBoard(boardId: BoardId) {
-        return this.getBoardHandler.execute(new GetBoardQuery(boardId));
+    async getBoard(query: GetBoardQuery) {
+        return this.getBoardHandler.execute(query);
     }
 
     async moveTicket(command: MoveTicketCommand) {
@@ -34,5 +37,4 @@ export class BoardServiceFacade {
     async addTicket(command: AddTicketCommand) {
         return this.addTicketHandler.execute(command);
     }
-    
 }

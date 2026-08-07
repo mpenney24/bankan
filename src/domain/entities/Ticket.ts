@@ -1,13 +1,16 @@
-import { Expose } from "class-transformer";
-import { ITicket, ITicketInternal } from "./TicketSchema.js";
+import { Expose } from 'class-transformer';
 
-import { createCurrentISODate, createTicketId, 
-    type ColumnId, type ISODateString, type TicketId 
-} from "../common/Types.js";
+import {
+    type ColumnId,
+    createCurrentISODate,
+    createTicketId,
+    type ISODateString,
+    type TicketId,
+} from '../common/Types.js';
+import { ITicket, ITicketInternal } from './TicketSchema.js';
 
 // DDD - Entity
 export class Ticket implements ITicketInternal {
-
     private _id: TicketId;
     private _columnId: ColumnId;
     private _name: string;
@@ -26,26 +29,54 @@ export class Ticket implements ITicketInternal {
         this._updated = payload?.updated;
     }
 
-    @Expose() get id(): TicketId { return this._id; }
-    private set id(id: TicketId) { this._id = id; }
+    @Expose() get id(): TicketId {
+        return this._id;
+    }
+    private set id(id: TicketId) {
+        this._id = id;
+    }
 
-    @Expose() get columnId(): ColumnId { return this._columnId; }
-    set columnId(columnId: ColumnId) { this._columnId = columnId; }
+    @Expose() get columnId(): ColumnId {
+        return this._columnId;
+    }
+    set columnId(columnId: ColumnId) {
+        this._columnId = columnId;
+    }
 
-    @Expose() get name(): string { return this._name; }
-    set name(name: string) { this._name = name; }
+    @Expose() get name(): string {
+        return this._name;
+    }
+    set name(name: string) {
+        this._name = name;
+    }
 
-    @Expose() get description(): string { return this._description; }
-    set description(description: string) { this._description = description; }
+    @Expose() get description(): string {
+        return this._description;
+    }
+    set description(description: string) {
+        this._description = description;
+    }
 
-    @Expose() get priority(): string { return this._priority; }
-    set priority(priority: string) { this._priority = priority; }
+    @Expose() get priority(): string {
+        return this._priority;
+    }
+    set priority(priority: string) {
+        this._priority = priority;
+    }
 
-    @Expose() get created(): ISODateString { return this._created; }
-    private set created(created: ISODateString) { this._created = created; }
+    @Expose() get created(): ISODateString {
+        return this._created;
+    }
+    private set created(created: ISODateString) {
+        this._created = created;
+    }
 
-    @Expose() get updated(): ISODateString | null { return this._updated; }
-    set updated(updated: ISODateString) { this._updated = updated; }
+    @Expose() get updated(): ISODateString | null {
+        return this._updated;
+    }
+    set updated(updated: ISODateString) {
+        this._updated = updated;
+    }
 
     public _transitionTo(newColumnId: ColumnId): void {
         this._columnId = newColumnId;
@@ -57,19 +88,18 @@ export class Ticket implements ITicketInternal {
             id: createTicketId(),
             created: createCurrentISODate(),
             updated: null,
-            ...payload
+            ...payload,
         });
     }
-
 }
 
 // ALTERNATIVE IMPL
 
 // https://www.typescriptlang.org/docs/handbook/2/classes.html#getters--setters
-//  "Note that a field-backed get/set pair with no extra logic is very rarely useful in JavaScript. 
+//  "Note that a field-backed get/set pair with no extra logic is very rarely useful in JavaScript.
 //   It’s fine to expose public fields if you don’t need to add additional logic during the get/set operations."
 
-// Despite the above, I decided that strict encapsulation was the better choice for DDD, ensuring that only the 
+// Despite the above, I decided that strict encapsulation was the better choice for DDD, ensuring that only the
 //  proper accessors/mutators were able to change certain fields (like updated at the same time as columnId).
 // Boilerplate getters/setters were also deemed preferable because of:
 //  A) explicit determining of which variables should be exposed to the mapping, and
@@ -93,7 +123,7 @@ export class Ticket implements ITicketInternal {
 
 //     public transitionTo(newColumnId: string): void {
 //         if (this.columnId === newColumnId) return;
-        
+
 //         this.columnId = newColumnId;
 //         this.updated = new Date().toISOString();
 //     }

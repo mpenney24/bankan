@@ -1,30 +1,29 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import * as h from "../../../domain/test/helpers.js";
-import { Board } from "../../../domain/entities/Board.js";
-import { Column } from "../../../domain/entities/Column.js";
-import { Ticket } from "../../../domain/entities/Ticket.js";
-import { createFirestoreConverter } from "./firestoreConverter.js";
-import { ClassConstructor, instanceToPlain } from "class-transformer";
-import { QueryDocumentSnapshot } from "firebase/firestore";
-import { ZodType } from "zod";
-import { BoardSchema } from "../../../domain/entities/BoardSchema.js";
-import { ColumnSchema } from "../../../domain/entities/ColumnSchema.js";
-import { TicketSchema } from "../../../domain/entities/TicketSchema.js";
+import { ClassConstructor, instanceToPlain } from 'class-transformer';
+import { QueryDocumentSnapshot } from 'firebase/firestore';
+import { beforeEach,describe, expect, it } from 'vitest';
+import { ZodType } from 'zod';
+
+import { Board } from '../../../domain/entities/Board.js';
+import { BoardSchema } from '../../../domain/entities/BoardSchema.js';
+import { Column } from '../../../domain/entities/Column.js';
+import { ColumnSchema } from '../../../domain/entities/ColumnSchema.js';
+import { Ticket } from '../../../domain/entities/Ticket.js';
+import { TicketSchema } from '../../../domain/entities/TicketSchema.js';
+import * as h from '../../../domain/test/helpers.js';
+import { createFirestoreConverter } from './firestoreConverter.js';
 
 describe('createFirestoreConverter', () => {
-
     let board: Board;
     let column: Column;
     let ticket: Ticket;
 
     beforeEach(() => {
         board = h.createBoard();
-        column = board.columns.find(col => col.id === h.COLUMN_ID_BACKLOG)!;
+        column = board.columns.find((col) => col.id === h.COLUMN_ID_BACKLOG)!;
         ticket = column.tickets[0]!;
     });
 
     describe('#toFirestore', () => {
-
         it('should successfully compose Board object into Firestore-compatible document', () => {
             verifyFirestoreComposition(board, BoardSchema);
         });
@@ -37,7 +36,10 @@ describe('createFirestoreConverter', () => {
             verifyFirestoreComposition(ticket, TicketSchema);
         });
 
-        function verifyFirestoreComposition(modelInstance: any, schema: ZodType<any>): void {
+        function verifyFirestoreComposition(
+            modelInstance: any,
+            schema: ZodType<any>
+        ): void {
             const clazz = modelInstance.constructor as ClassConstructor<any>;
             const converter = createFirestoreConverter(clazz, schema);
             const doc = converter.toFirestore(modelInstance);
@@ -45,20 +47,29 @@ describe('createFirestoreConverter', () => {
             expect(doc).not.toEqual({});
 
             const expectedPlain = instanceToPlain(modelInstance, {
-                strategy: 'excludeAll'
+                strategy: 'excludeAll',
             });
 
             expect(doc).toEqual(expectedPlain);
 
-            Object.keys(doc).forEach(key => {
+            Object.keys(doc).forEach((key) => {
                 expect(key.startsWith('_')).toBe(false);
             });
         }
 
+        it('should successfully process a POJO into Firestore-compatible document without further class or schema parsing', () => {
+            const obj = {
+                id: 'POJO',
+            };
+
+            const converter = createFirestoreConverter();
+            const result = converter.toFirestore(obj);
+
+            expect(result).toBe(obj);
+        });
     });
 
     describe('#fromFirestore', () => {
-
         it('should successfully decompose Firestore document into Board object', () => {
             verifyFirestoreDeomposition(board, BoardSchema);
         });
@@ -71,24 +82,41 @@ describe('createFirestoreConverter', () => {
             verifyFirestoreDeomposition(ticket, TicketSchema);
         });
 
-        function verifyFirestoreDeomposition(modelInstance: any, schema: ZodType<any>): void {
+        function verifyFirestoreDeomposition(
+            modelInstance: any,
+            schema: ZodType<any>
+        ): void {
             const clazz = modelInstance.constructor as ClassConstructor<any>;
             const converter = createFirestoreConverter(clazz, schema);
-    
+
             const plainData = instanceToPlain(modelInstance, {
-                strategy: 'excludeAll'
+                strategy: 'excludeAll',
             });
 
             const mockSnapshot = h.mock<QueryDocumentSnapshot>({
                 id: modelInstance.id,
                 data: () => plainData,
-            }); 
+            });
 
             const object = converter.fromFirestore(mockSnapshot);
 
             expect(object).toEqual(modelInstance);
         }
 
-    });
+        it('should successfully process a Firestore document into POJO without further class or schema parsing', () => {
+            const obj = {
+                id: 'POJO',
+            };
 
+            const mockSnapshot = h.mock<QueryDocumentSnapshot>({
+                id: obj.id,
+                data: () => obj,
+            });
+
+            const converter = createFirestoreConverter();
+            const result = converter.fromFirestore(mockSnapshot);
+
+            expect(result).toBe(obj);
+        });
+    });
 });

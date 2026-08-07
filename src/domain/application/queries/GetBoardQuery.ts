@@ -1,7 +1,5 @@
-import { BoardId } from "../../common/Types.js";
+import { BoardId } from '../../common/Types.js';
 
 export class GetBoardQuery {
-    constructor(
-        public readonly boardId: BoardId
-    ) {}
+    constructor(public readonly boardId: BoardId) {}
 }

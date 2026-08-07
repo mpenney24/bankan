@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback,useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { ERROR_CODES } from '../../errors/ErrorCodes.js';
-import { ICreateTicket, IMoveTicket } from '../../domain/entities/TicketSchema.js';
-import { useServices } from '../services/ServiceContext.js';
+
 import { Result } from '../../domain/common/Result.js';
-import { IBoardExternal } from '../../domain/entities/BoardSchema.js';
 import { BoardId } from '../../domain/common/Types.js';
+import { IBoardExternal } from '../../domain/entities/BoardSchema.js';
+import { ICreateTicket, IMoveTicket } from '../../domain/entities/TicketSchema.js';
+import { ERROR_CODES } from '../../errors/ErrorCodes.js';
+import { useServices } from '../services/ServiceContext.js';
 
 export function useBoard(boardId: BoardId) {
     const { boardServiceFacade } = useServices();
@@ -14,17 +15,18 @@ export function useBoard(boardId: BoardId) {
     const [error] = useState<Error | null>(null);
 
     useEffect(() => {
-        const unsubscribe = boardServiceFacade.subscribeToBoard(boardId, (fetchedBoard) => {
-            setBoard(fetchedBoard);
-            setLoading(false);
-        });
+        const unsubscribe = boardServiceFacade.subscribeToBoard(
+            boardId,
+            (fetchedBoard) => {
+                setBoard(fetchedBoard);
+                setLoading(false);
+            }
+        );
 
         return () => unsubscribe();
     }, [boardId]);
 
-    const updateBoard = async (
-        boardServiceFacadeUpdate: () => Promise<Result<void>>
-    ) => {
+    const updateBoard = async (boardServiceFacadeUpdate: () => Promise<Result<void>>) => {
         if (!board) return;
 
         // These now throw errors due to great encapsulation of the domain!
@@ -37,23 +39,42 @@ export function useBoard(boardId: BoardId) {
 
         const result = await boardServiceFacadeUpdate();
 
-        if(result.isFailure) {
+        if (result.isFailure) {
             console.error(ERROR_CODES.UIB01, result.error);
             toast.error(ERROR_CODES.UIB01);
         }
-    }
+    };
 
-    const handleTicketDrop = useCallback(async ({ ticketId, targetColumnId }: IMoveTicket) => {
-        await updateBoard(() => 
-            boardServiceFacade.moveTicket({ boardId, ticketId, targetColumnId })
-        );
-    }, [board]);
+    const handleTicketDrop = useCallback(
+        async ({ ticketId, targetColumnId }: IMoveTicket) => {
+            await updateBoard(() =>
+                boardServiceFacade.moveTicket({
+                    boardId,
+                    ticketId,
+                    targetColumnId,
+                })
+            );
+        },
+        [board]
+    );
 
-    const handleAddTicket = useCallback(async (createTicketPayload: ICreateTicket) => {
-        await updateBoard(() => 
-            boardServiceFacade.addTicket({boardId, createTicketPayload })
-        );
-    }, [board]);
+    const handleAddTicket = useCallback(
+        async (createTicketPayload: ICreateTicket) => {
+            await updateBoard(() =>
+                boardServiceFacade.addTicket({
+                    boardId,
+                    createTicketPayload,
+                })
+            );
+        },
+        [board]
+    );
 
-    return { board, loading, error, handleTicketDrop, handleAddTicket };
+    return {
+        board,
+        loading,
+        error,
+        handleTicketDrop,
+        handleAddTicket,
+    };
 }

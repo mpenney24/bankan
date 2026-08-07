@@ -1,5 +1,5 @@
-import { BoardId } from "../../common/Types.js";
-import { ICreateTicket } from "../../entities/TicketSchema.js";
+import { BoardId } from '../../common/Types.js';
+import { ICreateTicket } from '../../entities/TicketSchema.js';
 
 export class AddTicketCommand {
     constructor(

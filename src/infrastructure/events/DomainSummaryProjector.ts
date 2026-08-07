@@ -1,7 +1,10 @@
-import { DomainEventDispatcher } from "../../domain/events/DomainEventDispatcher.js";
-import { DomainEvent } from "../../domain/events/DomainEvents.js";
-import { ERROR_CODES } from "../../errors/ErrorCodes.js";
-import { FirestoreRepository, Identifiable } from "../persistence/firestore/FirestoreRepository.js";
+import { DomainEventDispatcher } from '../../domain/events/DomainEventDispatcher.js';
+import { DomainEvent } from '../../domain/events/DomainEvents.js';
+import { ERROR_CODES } from '../../errors/ErrorCodes.js';
+import {
+    FirestoreRepository,
+    Identifiable,
+} from '../persistence/firestore/FirestoreRepository.js';
 
 export interface IDomainSummary {
     readonly id: string;
@@ -14,7 +17,9 @@ export interface IDomainSummaryProjector {
     upsertSummary(summary: IDomainSummary): Promise<void>;
 }
 
-export abstract class DomainSummaryProjector<T extends Identifiable> implements IDomainSummaryProjector {
+export abstract class DomainSummaryProjector<
+    T extends Identifiable,
+> implements IDomainSummaryProjector {
     private unsubscribe: (() => void) | null = null;
 
     constructor(
@@ -25,9 +30,12 @@ export abstract class DomainSummaryProjector<T extends Identifiable> implements 
     ) {}
 
     public start(): void {
-        this.unsubscribe = this.eventBus.register(this.eventNameOrPrefix, async (event) => {
-            await this.handleDomainEvent(event);
-        });
+        this.unsubscribe = this.eventBus.register(
+            this.eventNameOrPrefix,
+            async (event) => {
+                await this.handleDomainEvent(event);
+            }
+        );
     }
 
     public stop(): void {
@@ -49,11 +57,10 @@ export abstract class DomainSummaryProjector<T extends Identifiable> implements 
     public async upsertSummary(summary: IDomainSummary): Promise<void> {
         try {
             this.summaryRepo.save(summary);
-        } catch(error) {
+        } catch (error) {
             console.log(ERROR_CODES.F02, error);
         }
     }
 
     protected abstract recalculateSummary(entity: T): Promise<void>;
-
 }

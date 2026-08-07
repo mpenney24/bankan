@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const BoardIdSchema = z.uuid().brand<"BoardId">();
-export const ColumnIdSchema = z.uuid().brand<"ColumnId">();
-export const TicketIdSchema = z.uuid().brand<"TicketId">();
+export const BoardIdSchema = z.uuid().brand<'BoardId'>();
+export const ColumnIdSchema = z.uuid().brand<'ColumnId'>();
+export const TicketIdSchema = z.uuid().brand<'TicketId'>();
 
 export type BoardId = z.infer<typeof BoardIdSchema>;
 export type ColumnId = z.infer<typeof ColumnIdSchema>;
@@ -24,11 +24,13 @@ export function createTicketId(): TicketId {
     return createId(TicketIdSchema);
 }
 
-export const StateSchema = z.string().brand<"State">(); // or z.enum(["TODO", "DOING", "DONE"])
+export const StateSchema = z
+    .enum(['BACKLOG', 'IN_PROGRESS', 'QA', 'DONE'])
+    .catch('INVALID' as any);
 
-export type State = z.infer<typeof StateSchema>;
+export type StateId = z.infer<typeof StateSchema>;
 
-export const ISODateStringSchema = z.iso.datetime().brand<"ISODateString">();
+export const ISODateStringSchema = z.iso.datetime().brand<'ISODateString'>();
 
 export type ISODateString = z.infer<typeof ISODateStringSchema>;
 

@@ -1,12 +1,13 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getFirestore, Firestore } from "firebase/firestore";
+import { getApps,initializeApp } from 'firebase/app';
+import { Firestore,getFirestore } from 'firebase/firestore';
 
 let db: Firestore;
 
 export function getFirestoreDb(): Firestore {
     if (db) return db;
 
-    const env = (typeof import.meta !== 'undefined' && (import.meta as any).env) || process.env;
+    const env =
+        (typeof import.meta !== 'undefined' && (import.meta as any).env) || process.env;
 
     if (getApps().length === 0) {
         initializeApp({
@@ -20,6 +21,6 @@ export function getFirestoreDb(): Firestore {
     }
 
     db = getFirestore();
-    
+
     return db;
 }

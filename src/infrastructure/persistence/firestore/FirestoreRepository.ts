@@ -1,18 +1,19 @@
-import { 
-    Firestore, 
-    CollectionReference, 
-    collection, 
-    doc, 
-    getDoc, 
-    getDocs, 
+import { ClassConstructor } from 'class-transformer';
+import {
+    collection,
+    CollectionReference,
+    doc,
+    Firestore,
+    getDoc,
+    getDocs,
     onSnapshot,
-    setDoc
-} from "firebase/firestore";
-import { createFirestoreConverter } from "./firestoreConverter.js";
-import { ClassConstructor } from "class-transformer";
-import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
-import { ZodType } from "zod";
-import { Result } from "../../../domain/common/Result.js";
+    setDoc,
+} from 'firebase/firestore';
+import { ZodType } from 'zod';
+
+import { Result } from '../../../domain/common/Result.js';
+import { ERROR_CODES } from '../../../errors/ErrorCodes.js';
+import { createFirestoreConverter } from './firestoreConverter.js';
 
 export interface Identifiable {
     readonly id: string;
@@ -25,7 +26,7 @@ export class FirestoreRepository<T extends Identifiable> {
     private readonly documents: CollectionReference<T>;
 
     constructor(
-        private readonly db: Firestore, 
+        private readonly db: Firestore,
         collectionName: string,
         entityClass?: ClassConstructor<T>,
         entitySchema?: ZodType<any>
@@ -37,7 +38,7 @@ export class FirestoreRepository<T extends Identifiable> {
 
     public subscribe(id: string, callback: EntitySubscriptionCallback<T>) {
         const docRef = doc(this.documents, id);
-        
+
         return onSnapshot(docRef, (snapshot) => {
             callback(snapshot.exists() ? snapshot.data() : null);
         });
@@ -46,11 +47,11 @@ export class FirestoreRepository<T extends Identifiable> {
     public async save(entity: T): Promise<Result<void>> {
         const docRef = doc(this.documents, entity.id);
 
-        if(entity.version) entity.version++;
-        
+        if (entity.version) entity.version++;
+
         try {
             await setDoc(docRef, entity);
-            
+
             return Result.ok();
         } catch (error: any) {
             console.log(error.message);
@@ -60,15 +61,15 @@ export class FirestoreRepository<T extends Identifiable> {
 
     public async getAll(): Promise<T[]> {
         const querySnapshot = await getDocs(this.documents);
-        return querySnapshot.docs.map(docSnap => docSnap.data());
+        return querySnapshot.docs.map((docSnap) => docSnap.data());
     }
 
     public async getById(id: string): Promise<Result<T>> {
         if (!id || id.trim() === '') throw new Error(ERROR_CODES.F00);
-    
+
         const docRef = doc(this.documents, id);
         const snapshot = await getDoc(docRef);
-        
+
         if (!snapshot.exists()) return Result.fail(ERROR_CODES.F01(id));
         return Result.ok(snapshot.data());
     }

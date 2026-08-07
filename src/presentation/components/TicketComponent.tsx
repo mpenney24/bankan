@@ -1,7 +1,8 @@
 // src/presentation/components/TicketCard.tsx
 import React from 'react';
-import { Ticket } from '../../domain/entities/Ticket.js';
 import { styled } from 'styled-components';
+
+import { Ticket } from '../../domain/entities/Ticket.js';
 
 const CardContainer = styled.div`
     background-color: white;

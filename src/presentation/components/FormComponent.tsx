@@ -1,4 +1,4 @@
-import { useFormContext, FieldPath, FieldValues } from 'react-hook-form';
+import { FieldPath, FieldValues,useFormContext } from 'react-hook-form';
 
 interface FormFieldProps<T extends FieldValues> {
     name: FieldPath<T>;
@@ -13,11 +13,15 @@ export function FormField<T extends FieldValues>({
     label,
     placeholder,
     isTextarea = false,
-    containerClassName = 'form-group'
+    containerClassName = 'form-group',
 }: FormFieldProps<T>) {
-    const { register, formState: { errors } } = useFormContext<T>();
-    
-    const errorMessage = name.split('.').reduce((obj: any, key) => obj?.[key], errors)?.message as string | undefined;
+    const {
+        register,
+        formState: { errors },
+    } = useFormContext<T>();
+
+    const errorMessage = name.split('.').reduce((obj: any, key) => obj?.[key], errors)
+        ?.message as string | undefined;
 
     return (
         <div className={containerClassName}>

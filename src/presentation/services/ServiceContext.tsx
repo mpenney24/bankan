@@ -1,8 +1,9 @@
 import { createContext, useContext } from 'react';
+
 import { BoardServiceFacade } from '../../domain/application/facades/BoardServiceFacade.js';
 
 interface ServiceContainer {
-    boardServiceFacade: BoardServiceFacade
+    boardServiceFacade: BoardServiceFacade;
 }
 
 const ServiceContext = createContext<ServiceContainer | null>(null);

@@ -1,7 +1,7 @@
-import { CompositeSpecification } from "../Specification.js";
-import { ColumnId, TicketId } from "../Types.js";
-import { Ticket } from "../../entities/Ticket.js";
-import { ERROR_CODES } from "../../../errors/ErrorCodes.js";
+import { ERROR_CODES } from '../../../errors/ErrorCodes.js';
+import { Ticket } from '../../entities/Ticket.js';
+import { CompositeSpecification } from '../Specification.js';
+import { ColumnId, TicketId } from '../Types.js';
 
 export class TicketByIdSpec extends CompositeSpecification<Ticket> {
     public readonly errorMessage: string;
@@ -10,7 +10,7 @@ export class TicketByIdSpec extends CompositeSpecification<Ticket> {
         super();
         this.errorMessage = ERROR_CODES.B01(ticketId);
     }
-    
+
     isSatisfiedBy(ticket: Ticket): boolean {
         return ticket.id === this.ticketId;
     }
@@ -22,7 +22,7 @@ export class TicketCanBeMovedSpec extends CompositeSpecification<Ticket> {
     constructor(private targetColumnId: ColumnId) {
         super();
     }
-    
+
     isSatisfiedBy(ticket: Ticket): boolean {
         return ticket.columnId !== this.targetColumnId;
     }
@@ -34,7 +34,7 @@ export class TicketCanBeAddedSpec extends CompositeSpecification<Ticket> {
     constructor(public readonly ticketToAdd: Ticket) {
         super();
     }
-    
+
     isSatisfiedBy(ticket: Ticket): boolean {
         return ticket.id !== this.ticketToAdd.id;
     }

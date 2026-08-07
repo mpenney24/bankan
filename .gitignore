@@ -17,3 +17,4 @@ out/
 
 #Local files
 src/run.ts
+tsconfig.tsbuildinfo

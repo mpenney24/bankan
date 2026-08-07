@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ColumnComponent } from '../components/ColumnComponent.js';
 import { styled } from 'styled-components';
-import { useBoard } from '../hooks/useBoard.js';
-import { AddTicketForm } from '../forms/AddTicketForm.js';
-import { BoardId } from '../../domain/common/Types.js';
+
 import { ColumnByIdSpec } from '../../domain/common/specifications/ColumnSpecs.js';
+import { BoardId } from '../../domain/common/Types.js';
+import { ColumnComponent } from '../components/ColumnComponent.js';
+import { AddTicketForm } from '../forms/AddTicketForm.js';
+import { useBoard } from '../hooks/useBoard.js';
 
 const ColumnsWrapper = styled.div`
     display: flex;
@@ -25,7 +26,8 @@ const ColumnsWrapper = styled.div`
 const BOARD_ID: BoardId = import.meta.env.VITE_FIREBASE_BOARD_ID;
 
 export const BoardView: React.FC = () => {
-    const { board, loading, error, handleTicketDrop, handleAddTicket } = useBoard(BOARD_ID);
+    const { board, loading, error, handleTicketDrop, handleAddTicket } =
+        useBoard(BOARD_ID);
     const [isAdding, setIsAdding] = useState(false);
 
     if (loading) return <div>Loading board...</div>;
@@ -44,14 +46,14 @@ export const BoardView: React.FC = () => {
                 {isAdding && (
                     <div className="modal-overlay">
                         <div className="modal-content">
-                            <button 
-                                className="modal-close" 
+                            <button
+                                className="modal-close"
                                 onClick={() => setIsAdding(false)}
                             >
                                 &times;
                             </button>
-                            
-                            <AddTicketForm 
+
+                            <AddTicketForm
                                 onAddTicket={(payload) => {
                                     handleAddTicket(payload);
                                     setIsAdding(false);
@@ -63,13 +65,20 @@ export const BoardView: React.FC = () => {
             </div>
 
             <ColumnsWrapper>
-                {board.columns.map(col => (
+                {board.columns.map((col) => (
                     <ColumnComponent
                         key={col.id}
                         columnId={col.id}
                         title={col.displayName}
-                        tickets={board.getTickets({ columnSpec: new ColumnByIdSpec(col.id) })}
-                        onTicketDrop={(ticketId, targetColumnId) => handleTicketDrop({ ticketId, targetColumnId })}
+                        tickets={board.getTickets({
+                            columnSpec: new ColumnByIdSpec(col.id),
+                        })}
+                        onTicketDrop={(ticketId, targetColumnId) =>
+                            handleTicketDrop({
+                                ticketId,
+                                targetColumnId,
+                            })
+                        }
                     />
                 ))}
             </ColumnsWrapper>

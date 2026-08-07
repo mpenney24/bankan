@@ -1,4 +1,4 @@
-import { DomainEvent, DomainEventProducer } from "./DomainEvents.js";
+import { DomainEvent, DomainEventProducer } from './DomainEvents.js';
 
 export abstract class DomainEventAggregateRoot implements DomainEventProducer {
     abstract readonly id: string;

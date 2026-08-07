@@ -13,17 +13,10 @@ export class AddTicketHandler {
     ) {}
 
     async execute(command: AddTicketCommand): Promise<Result<void>> {
-        const boardResult = await this.boardRepo.getById(command.boardId);
-        if (boardResult.isFailure) {
-            return Result.fail(boardResult.error);
-        }
-        const board = boardResult.value;
-
-        const addResult = board.addTicket(Ticket.create(command.createTicketPayload));
-        if (addResult.isFailure) {
-            return addResult;
-        }
-
-        return persistAndDispatch(this.boardRepo, this.eventDispatcher, board);
+        return (await this.boardRepo.getById(command.boardId)).bind((board) =>
+            board.addTicket(Ticket.create(command.createTicketPayload)).map(() => {
+                persistAndDispatch(this.boardRepo, this.eventDispatcher, board);
+            })
+        );
     }
 }

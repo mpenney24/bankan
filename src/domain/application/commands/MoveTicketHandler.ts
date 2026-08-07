@@ -12,17 +12,10 @@ export class MoveTicketHandler {
     ) {}
 
     async execute(command: MoveTicketCommand): Promise<Result<void>> {
-        const boardResult = await this.boardRepo.getById(command.boardId);
-        if (boardResult.isFailure) {
-            return Result.fail(boardResult.error);
-        }
-        const board = boardResult.value;
-
-        const moveResult = board.moveTicket(command.ticketId, command.targetColumnId);
-        if (moveResult.isFailure) {
-            return moveResult;
-        }
-
-        return persistAndDispatch(this.boardRepo, this.eventDispatcher, board);
+        return (await this.boardRepo.getById(command.boardId)).bind((board) =>
+            board.moveTicket(command.ticketId, command.targetColumnId).map(() => {
+                persistAndDispatch(this.boardRepo, this.eventDispatcher, board);
+            })
+        );
     }
 }

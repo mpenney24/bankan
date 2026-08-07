@@ -1,9 +1,9 @@
-import { DomainEvent } from "./DomainEvents.js";
+import { DomainEvent } from './DomainEvents.js';
 
 export type DomainEventHandler = (event: DomainEvent) => Promise<void> | void;
 
 export interface DomainEventDispatcher {
-    register(eventNameOrPrefix: string, handler: DomainEventHandler): () => void, 
+    register(eventNameOrPrefix: string, handler: DomainEventHandler): () => void;
     dispatch(events: DomainEvent[]): Promise<void>;
 }
 
@@ -16,7 +16,7 @@ export class InMemoryEventDispatcher implements DomainEventDispatcher {
 
         return () => {
             this.handlers.clear();
-        }
+        };
     }
 
     public async dispatch(events: DomainEvent[]): Promise<void> {
@@ -24,7 +24,6 @@ export class InMemoryEventDispatcher implements DomainEventDispatcher {
             const eventName = event.constructor.name;
 
             for (const [eventNameOrPrefix, handlers] of this.handlers.entries()) {
-
                 if (eventName.startsWith(eventNameOrPrefix)) {
                     for (const handler of handlers) {
                         await handler(event);

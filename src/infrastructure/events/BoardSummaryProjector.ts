@@ -1,5 +1,5 @@
-import { DomainSummaryProjector, IDomainSummary } from "./DomainSummaryProjector.js";
-import { Board } from "../../domain/entities/Board.js";
+import { Board } from '../../domain/entities/Board.js';
+import { DomainSummaryProjector, IDomainSummary } from './DomainSummaryProjector.js';
 
 export interface BoardSummaryReadModel extends IDomainSummary {
     readonly columnCount: number;
@@ -7,10 +7,9 @@ export interface BoardSummaryReadModel extends IDomainSummary {
 }
 
 export class BoardSummaryProjector extends DomainSummaryProjector<Board> {
-    
     protected async recalculateSummary(board: Board): Promise<void> {
         const totalTickets = board.columns.reduce(
-            (acc, col) => acc + (col.tickets?.length ?? 0), 
+            (acc, col) => acc + (col.tickets?.length ?? 0),
             0
         );
 
@@ -18,10 +17,9 @@ export class BoardSummaryProjector extends DomainSummaryProjector<Board> {
             id: board.id,
             columnCount: board.columns.length,
             totalTickets,
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
         };
 
         await this.upsertSummary(summary);
     }
-
 }

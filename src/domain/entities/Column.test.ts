@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import * as h from "../test/helpers.js";
-import { Column } from "./Column.js";
-import { Ticket } from "./Ticket.js";
-import { TicketCanBeAddedSpec } from "../common/specifications/TicketSpecs.js";
+import { beforeEach,describe, expect, it } from 'vitest';
+
+import { TicketCanBeAddedSpec } from '../common/specifications/TicketSpecs.js';
+import * as h from '../test/helpers.js';
+import { Column } from './Column.js';
+import { Ticket } from './Ticket.js';
 
 describe('Column', () => {
-
     let column: Column;
     let ticket: Ticket;
     let ticketAddSpec: TicketCanBeAddedSpec;
@@ -14,11 +14,10 @@ describe('Column', () => {
         column = h.createColumn(h.COLUMN_STATE_ID_BACKLOG);
         ticket = h.createTicket(h.COLUMN_ID_BACKLOG);
         ticketAddSpec = new TicketCanBeAddedSpec(ticket);
-    })
+    });
 
     describe('#addTicket', () => {
-        
-        it('should successfully add a new ticket', () => { 
+        it('should successfully add a new ticket', () => {
             expect(column.tickets).toHaveLength(0);
 
             column._addTicket(ticketAddSpec);
@@ -36,8 +35,6 @@ describe('Column', () => {
             expect(column.tickets).toHaveLength(1);
             expect(column.tickets).toContain(ticket);
         });
-
-        
     });
 
     describe('#removeTicket', () => {

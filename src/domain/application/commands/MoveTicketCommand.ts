@@ -1,4 +1,4 @@
-import { BoardId, ColumnId, TicketId } from "../../common/Types.js";
+import { BoardId, ColumnId, TicketId } from '../../common/Types.js';
 
 export class MoveTicketCommand {
     constructor(
