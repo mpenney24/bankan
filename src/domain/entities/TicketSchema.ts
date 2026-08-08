@@ -10,7 +10,7 @@ import {
 export const CreateTicketSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     columnId: ColumnIdSchema.min(1, 'Column Id is required').default(
-        ColumnIdSchema.parse(process.env.VITE_FIREBASE_COLUMN_ID)
+        ColumnIdSchema.parse(import.meta.env.VITE_FIREBASE_COLUMN_ID)
     ),
     description: z.string().min(1, 'Description is required'),
     priority: z.string().min(1, 'Priority is required'),
