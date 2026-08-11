@@ -21,7 +21,7 @@
         // Recommended Options
         "strict": true,
         "jsx": "react-jsx",
-        "types": ["vite/client"],
+        "types": ["vite/client", "node"],
         "isolatedModules": true,
         "moduleDetection": "force",
         "skipLibCheck": true

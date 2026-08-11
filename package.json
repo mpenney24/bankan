@@ -1,5 +1,5 @@
 {
-    "name": "leetcode",
+    "name": "bankan",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
@@ -8,7 +8,7 @@
     },
     "type": "module",
     "scripts": {
-        "build": "tsc",
+        "build": "tsc && vite build",
         "pretest": "npm run lint:fix && npm run build",
         "test": "vitest",
         "modules": "rm -rf node_modules package-lock.json && npm i",
@@ -21,7 +21,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "@types/node": "25.6.2",
+        "@types/node": "^25.6.2",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "^6.0.4",
