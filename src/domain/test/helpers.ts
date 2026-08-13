@@ -17,6 +17,15 @@ export const mock = <T>(implementation: Partial<T>): T => {
     return implementation as T;
 };
 
+// E2E TEST FIRESTORE RE-ROUTE
+
+export function isMockMode(): boolean {
+    const viteEnv = typeof import.meta !== 'undefined' && (import.meta as any).env;
+    const mode = import.meta.env.MODE;
+
+    return viteEnv?.VITE_USE_MOCK === 'true' || mode === 'test';
+}
+
 // KEY LOGIC
 
 export const COLUMN_ID_BACKLOG: ColumnId = createColumnId();

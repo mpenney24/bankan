@@ -1,5 +1,5 @@
 import { ClassConstructor } from 'class-transformer';
-import { afterAll,beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ERROR_CODES } from '../../errors/ErrorCodes.js';
 import {

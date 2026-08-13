@@ -1,27 +1,32 @@
 {
-    "name": "bankan",
+    "name": "bankan-mp",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
-    "directories": {
-        "test": "test"
-    },
     "type": "module",
     "scripts": {
         "build": "tsc && vite build",
-        "pretest": "npm run lint:fix && npm run build",
+        "build:test": "vite build --mode test",
+        "pretest": "npm run build",
         "test": "vitest",
         "modules": "rm -rf node_modules package-lock.json && npm i",
+        "docker:up": "docker compose build --no-cache && docker compose up",
+        "docker:down": "docker compose down",
+        "docker:prod": "docker build -f Dockerfile.prod -t bankan-frontend:prod .",
+        "format": "prettier --write \".\" && npm run lint",
+        "lint": "eslint . --fix",
         "db": "tsx ./src/run.ts",
         "dev": "npm run pretest && npx vite",
-        "format": "prettier --write \".\" ",
-        "lint:fix": "eslint . --fix"
+        "test:db": "npx firebase emulators:start --import test-data",
+        "test:e2e:local": "npx firebase-tools emulators:exec --import test-data \"npm run build:test && npx playwright test --ui --headed\"",
+        "test:e2e": "npx firebase-tools emulators:exec --import test-data \"npm run build:test && npx playwright test\"",
+        "test:e2e:preview": "npx firebase-tools emulators:exec --import test-data \"npm run build:test && npx vite preview --mode test\""
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "@types/node": "^25.6.2",
+        "@playwright/test": "^1.62.1",
+        "@types/node": "^25.9.5",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "^6.0.4",
@@ -30,11 +35,13 @@
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-simple-import-sort": "^14.0.0",
         "eslint-plugin-unused-imports": "^4.4.1",
+        "firebase-tools": "^15.26.0",
         "prettier": "^3.9.6",
         "tsx": "^4.23.1",
         "typescript": "6.0.3",
         "typescript-eslint": "^8.66.0",
         "vite": "^8.1.5",
+        "vite-node": "^6.0.0",
         "vitest": "^4.1.10"
     },
     "dependencies": {

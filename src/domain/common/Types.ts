@@ -8,8 +8,8 @@ export type BoardId = z.infer<typeof BoardIdSchema>;
 export type ColumnId = z.infer<typeof ColumnIdSchema>;
 export type TicketId = z.infer<typeof TicketIdSchema>;
 
-function createId(schema: z.ZodType<any>) {
-    return schema.parse(crypto.randomUUID());
+export function createId(schema: z.ZodType<any>, id?: string) {
+    return schema.parse(id ?? crypto.randomUUID());
 }
 
 export function createBoardId(): BoardId {

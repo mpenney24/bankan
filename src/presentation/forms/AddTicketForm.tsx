@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { CreateTicketSchema,ICreateTicket } from '../../domain/entities/TicketSchema.js';
+import { CreateTicketSchema, ICreateTicket } from '../../domain/entities/TicketSchema.js';
 import { ERROR_CODES } from '../../errors/ErrorCodes.js';
 import { FormField } from '../components/FormComponent.js';
 

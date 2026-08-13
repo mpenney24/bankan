@@ -11,10 +11,14 @@ out/
 
 # Environment variables, logs
 .env
-*firebase*.json
+firestore-debug.log
 *.log
 
 #Local files
 src/run.ts
 tsconfig.tsbuildinfo
 docker-compose.override.yml
+playwright-report
+test-results
+scripts/
+seed*

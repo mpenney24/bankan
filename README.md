@@ -5,6 +5,7 @@ Hello there, and welcome to Bankan!
 ![Project Banner](./screenshots/Snapshot_2026-08-09_14-59-21.png)
 
 ## 📌 Table of Contents
+
 - About the Project
 - Built With
 - Features
@@ -28,7 +29,7 @@ This idea is known as Domain-Driven Design (DDD), and it thinks about software i
 
 It all sounded very challenging, yet at the same time very plausible. I wondered what such a system might look like...
 
-And then I wondered... could *I* make such a system?
+And then I wondered... could _I_ make such a system?
 
 Thus, was the Bankan project born.
 
@@ -43,7 +44,7 @@ Over the course of the project I ended up implementing much more than just DDD (
 > 7. Command Query Responsibility Segregation (CQRS) to separate read/write concerns
 > 8. Optimistic Concurrency Control (OCC) to keep the UI lightning-fast while db updates complete in the background (and roll the board back, such as failing to add a new ticket, or move a ticket to a different column)
 > 9. Branded Types (to prevent parameter-chain order issues, such as introducing bugs through mixing up which primitive "string" id goes where [we've all done it - be honest!])
-> 10. Railway-oriented Programming, using monads to dictate control flow rather than exception-handling blocks (an anti-pattern these days) 
+> 10. Railway-oriented Programming, using monads to dictate control flow rather than exception-handling blocks (an anti-pattern these days)
 
 Overall, I'm happy with what I accomplished in the space of 2 weeks' development time, and I feel I've made a robust, well-encapsulated, architecturally sound bit of code!
 
@@ -57,24 +58,25 @@ Mitch
 
 ## 🛠️ Built With
 
-* [TypeScript](https://www.typescriptlang.org/)
-* [Node.js](https://nodejs.org/)
-* [Google Firestore](https://firebase.google.com/)
-* [React](https://react.dev/)
-* [Zod](https://zod.dev/)
-* [Vitest](https://vitest.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Node.js](https://nodejs.org/)
+- [Google Firestore](https://firebase.google.com/)
+- [React](https://react.dev/)
+- [Zod](https://zod.dev/)
+- [Vitest](https://vitest.dev/)
 
 ---
 
 ## ✨ Features
 
 Some parts of the project to pay attention to:
-* **Domain-Driven Design (DDD):** - _Board.ts_, the Aggregate Root of this project
-* **Real-time Database:** - _FirestoreRepository.ts_, for seamless reads and writes with a document-based db
-* **Robust DI Testing:** - See the many Vitest x.test.ts files incorporating Dependency Injection and effective mocking (unit tests only, but int tests could be added!)
-* **Zod validation:** - _firestoreConverter.ts_, to see run-time Zod schema validation (both to/from the db, as it's easy for data to become stale with overlooked application updates!)
-* **React UI:** - _BoardView.tsx_ and _useBoard.ts_, the lightning-fast form and hook which subscribes to domain updates and allows the drag/drop of tickets between columns, as well as ticket creation
-* **In-memory Event Dispatching:** - _DomainEventDispatcher.ts_, to see event payloads pushed to the console (could be funneled into monitoring for system health or usage statistics)
+
+- **Domain-Driven Design (DDD):** - _Board.ts_, the Aggregate Root of this project
+- **Real-time Database:** - _FirestoreRepository.ts_, for seamless reads and writes with a document-based db
+- **Robust DI Testing:** - See the many Vitest x.test.ts files incorporating Dependency Injection and effective mocking (unit tests only, but int tests could be added!)
+- **Zod validation:** - _firestoreConverter.ts_, to see run-time Zod schema validation (both to/from the db, as it's easy for data to become stale with overlooked application updates!)
+- **React UI:** - _BoardView.tsx_ and _useBoard.ts_, the lightning-fast form and hook which subscribes to domain updates and allows the drag/drop of tickets between columns, as well as ticket creation
+- **In-memory Event Dispatching:** - _DomainEventDispatcher.ts_, to see event payloads pushed to the console (could be funneled into monitoring for system health or usage statistics)
 
 ---
 
@@ -86,7 +88,7 @@ Some parts of the project to pay attention to:
   <img src="./screenshots/Snapshot_2026-08-09_15-11-06.png" width="600" style=margin-bottom: 25px;/>
   <img src="./screenshots/Snapshot_2026-08-09_15-11-22.png" width="600" style=margin-bottom: 25px;/>
 
-  Video:
-  https://github.com/user-attachments/assets/d78ff84e-b6fb-44e7-a127-593106b3abc4
+Video:
+https://github.com/user-attachments/assets/d78ff84e-b6fb-44e7-a127-593106b3abc4
 
 </div>

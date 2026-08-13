@@ -1,33 +1,89 @@
 name: CI / Test Pipeline
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+    push:
+        branches: [main, master]
+    pull_request:
+        branches: [main, master]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+    typecheck:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+            - name: Set up Node.js (and Cache Dependencies)
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24.18.0
+                  cache: 'npm'
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile
-          load: true
-          tags: bankan-backend:latest
+            - name: TypeCheck TypeScript
+              run: npx tsc --noEmit
 
-      - name: Run tests
-        run: |
-          docker run --rm \
-            -e VITE_FIREBASE_COLUMN_ID="${{ secrets.VITE_FIREBASE_COLUMN_ID }}" \
-            -e VITE_FIREBASE_API_KEY="${{ secrets.VITE_FIREBASE_API_KEY }}" \
-            bankan-backend:latest npm test
+    docker-test:
+        needs: typecheck
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Docker
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: Dockerfile
+                  load: true
+                  tags: bankan-backend:latest
+
+            - name: Run containerised test suite
+              run: |
+                  docker run --rm \
+                    -e VITE_FIREBASE_COLUMN_ID="${{ secrets.VITE_FIREBASE_COLUMN_ID }}" \
+                    -e VITE_FIREBASE_API_KEY="${{ secrets.VITE_FIREBASE_API_KEY }}" \
+                    bankan-backend:latest npm test
+
+    e2e-tests:
+        needs: docker-test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js (and Cache Dependencies)
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24.18.0
+                  cache: 'npm'
+
+            - name: Set up Java 21 (Required for Firebase Emulators)
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'temurin'
+                  java-version: '21'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Install Playwright browsers (Chrome only)
+              run: npx playwright install --with-deps chromium
+
+            - name: Run Playwright E2E Tests
+              run: npm run test:e2e
+              env:
+                  CI: true
+
+            - name: Upload Playwright Report on Failure
+              uses: actions/upload-artifact@v4
+              if: failure()
+              with:
+                  name: playwright-report
+                  path: playwright-report/
+                  retention-days: 7

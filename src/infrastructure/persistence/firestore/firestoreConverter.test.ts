@@ -1,6 +1,6 @@
 import { ClassConstructor, instanceToPlain } from 'class-transformer';
 import { QueryDocumentSnapshot } from 'firebase/firestore';
-import { beforeEach,describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ZodType } from 'zod';
 
 import { Board } from '../../../domain/entities/Board.js';

@@ -1,31 +1,4 @@
 {
-    "compilerOptions": {
-        // File Layout
-        "rootDir": "./src",
-        "outDir": "./dist",
-        "composite": true,
-        // Environment Settings
-        "module": "nodenext",
-        "target": "esnext",
-        "noEmit": true,
-        // Other Outputs
-        "sourceMap": true,
-        "declaration": true,
-        "declarationMap": true,
-        // Stricter Typechecking Options
-        "noUncheckedIndexedAccess": true,
-        "exactOptionalPropertyTypes": true,
-        // Reflection/annotations
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        // Recommended Options
-        "strict": true,
-        "jsx": "react-jsx",
-        "types": ["vite/client", "node"],
-        "isolatedModules": true,
-        "moduleDetection": "force",
-        "skipLibCheck": true
-    },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules", "vitest.config.ts", "vitest.setup.ts"]
+    "files": [],
+    "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }
