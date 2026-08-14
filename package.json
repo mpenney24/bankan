@@ -8,7 +8,7 @@
         "build:test": "vite build --mode test",
         "pretest": "npm run build",
         "test": "vitest",
-        "modules": "rm -rf node_modules package-lock.json && npm i",
+        "modules": "rm -rf dist node_modules package-lock.json && npm i",
         "docker:up": "docker compose build --no-cache && docker compose up",
         "docker:down": "docker compose down",
         "docker:prod": "docker build -f Dockerfile.prod -t bankan-frontend:prod .",
@@ -26,6 +26,7 @@
     "license": "ISC",
     "devDependencies": {
         "@playwright/test": "^1.62.1",
+        "@types/amqplib": "^0.10.8",
         "@types/node": "^25.9.5",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",

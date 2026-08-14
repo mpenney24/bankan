@@ -5,7 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
-import { boardServiceFacade } from './infrastructure/serviceContainer.js';
+import { boardServiceFacade } from './infrastructure/clientContainer.js';
 import { ServiceProvider } from './presentation/services/ServiceContext.js';
 import { BoardView } from './presentation/views/BoardView.js';
 

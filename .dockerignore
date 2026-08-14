@@ -1,5 +1,37 @@
+# Dependencies & Build Outputs
 node_modules
 dist
+e2e
+playwright-report
+test-data
+test-results
+
+# Version Control & CI
 .git
+.github
+
+# Environment & Secrets
 .env
+.env.*
+
+# Docker & Orchestration (Not needed inside the image)
+docker-compose*.yml
+Dockerfile*
+
+# Documentation & Local Configs
+README.md
+.prettierrc
+.firebaserc
+firebase.json
+firestore.rules
+firestore.indexes.json
+playwright.config.ts
+versel.json
+
+# Logs
 *.log
+npm-debug.log*
+firestore-debug.log*
+
+# IDEs & Editor Files
+.vscode
