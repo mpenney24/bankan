@@ -1,4 +1,9 @@
 {
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "bundler"
+    },
     "files": [],
-    "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+    "references": [{ "path": "./packages/domain" }, { "path": "./app/web" }]
 }

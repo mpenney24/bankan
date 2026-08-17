@@ -15,7 +15,6 @@ firestore-debug.log
 *.log
 
 #Local files
-src/run.ts
 tsconfig.tsbuildinfo
 docker-compose.override.yml
 playwright-report

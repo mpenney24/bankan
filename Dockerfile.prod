@@ -2,16 +2,19 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
+COPY app/web/package.json ./app/web/
+COPY packages/domain/package.json ./packages/domain/
+
 RUN npm ci
 
 COPY . .
 
-RUN npm run build
+RUN npm run build --workspace=app/web
 
 FROM nginx:alpine
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/app/web/dist /usr/share/nginx/html
 
 EXPOSE 80
 

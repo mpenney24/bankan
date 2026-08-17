@@ -1,0 +1,23 @@
+{
+    "name": "@bankan/domain",
+    "version": "1.0.0",
+    "private": true,
+    "main": "./src/index.ts",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        }
+    },
+    "scripts": {
+        "test": "vitest"
+    },
+    "dependencies": {
+        "class-transformer": "^0.4.1",
+        "reflect-metadata": "^0.2.2",
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "vitest": "^4.1.10"
+    }
+}

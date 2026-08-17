@@ -6,7 +6,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 export default [
     {
-        ignores: ['node_modules/', 'dist/', 'build/', 'playwright-report/'],
+        ignores: ['node_modules/', 'app/web/dist/', 'build/', 'playwright-report/'],
     },
     {
         files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
