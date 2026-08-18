@@ -5,9 +5,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
-import { boardServiceFacade } from './infrastructure/clientContainer.js';
-import { ServiceProvider } from './presentation/services/ServiceContext.js';
-import { BoardView } from './presentation/views/BoardView.js';
+import { boardServiceFacade } from './infrastructure/clientContainer';
+import { ServiceProvider } from './presentation/services/ServiceContext';
+import { BoardView } from './presentation/views/BoardView';
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
