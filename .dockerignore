@@ -30,7 +30,7 @@ versel.json
 
 # Logs
 *.log
-npm-debug.log*
+pnpm-debug.log*
 firestore-debug.log*
 
 # IDEs & Editor Files

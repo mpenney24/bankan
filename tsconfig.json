@@ -4,6 +4,5 @@
         "module": "esnext",
         "moduleResolution": "bundler"
     },
-    "files": [],
-    "references": [{ "path": "./packages/domain" }, { "path": "./app/web" }]
+    "include": ["playwright.config.ts", "**/*.config.ts"]
 }

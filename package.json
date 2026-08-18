@@ -2,26 +2,30 @@
     "name": "bankan-monorepo",
     "version": "1.0.0",
     "private": true,
+    "type": "module",
     "workspaces": [
         "app/*",
         "packages/*"
     ],
     "scripts": {
-        "build": "npm run build --workspace=app/web",
-        "test": "npm run test --workspaces",
-        "modules": "rm -rf dist node_modules package-lock.json && npm i",
+        "build": "pnpm --filter @bankan/app build",
+        "test": "pnpm -r test",
+        "modules": "rm -rf dist node_modules pnpm-lock.yaml && pnpm i",
         "docker:up": "docker compose build --no-cache && docker compose up",
         "docker:down": "docker compose down",
         "docker:prod": "docker build -f Dockerfile.prod -t bankan-frontend:prod . && docker compose up",
-        "format": "prettier --write \".\" && npm run lint",
+        "format": "prettier --write \".\" && pnpm run lint",
         "lint": "eslint . --fix",
-        "dev": "npm run dev --workspace=app/web",
-        "test:e2e": "npm run test:e2e --workspace=app/web",
-        "test:e2e:local": "npm run test:e2e:local --workspace=app/web",
-        "test:e2e:preview": "npm run test:e2e:preview --workspace=app/web"
+        "dev": "pnpm --filter @bankan/app dev",
+        "test:e2e": "pnpm --filter @bankan/app test:e2e",
+        "test:e2e:local": "pnpm --filter @bankan/app test:e2e:local",
+        "test:e2e:preview": "pnpm --filter @bankan/app test:e2e:preview"
     },
     "devDependencies": {
         "@playwright/test": "^1.62.1",
+        "@types/node": "^25.9.5",
+        "@typescript-eslint/eslint-plugin": "^8.67.0",
+        "@typescript-eslint/parser": "^8.67.0",
         "eslint": "^10.8.1",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-simple-import-sort": "^14.0.0",

@@ -5,7 +5,7 @@
         "moduleResolution": "bundler",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "types": ["node", "vite/client"],
+        "types": ["node"],
         "rootDir": "./src",
         "outDir": "./dist",
         "strict": true,

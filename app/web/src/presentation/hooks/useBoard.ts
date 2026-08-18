@@ -63,7 +63,6 @@ function createBoardAction<TCommand extends Record<string, any>>(
     boardServiceFacadeUpdate: (command: TCommand) => Promise<Result<void>>
 ) {
     return async (command: TCommand) => {
-
         // Mitch - These now throw errors due to great encapsulation of the domain!
 
         // const col = board.columns[0]!

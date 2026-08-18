@@ -18,7 +18,7 @@ export default defineConfig({
         },
     ],
     webServer: {
-        command: 'npx vite build --mode test && npx vite preview --mode test',
+        command: 'pnpm vite build --mode test && pnpm vite preview --mode test',
         env: {
             VITE_FIREBASE_COLUMN_ID:
                 process.env.VITE_FIREBASE_COLUMN_ID ||
